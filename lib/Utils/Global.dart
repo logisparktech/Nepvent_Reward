@@ -1,16 +1,18 @@
 import 'package:dio/dio.dart';
-import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:flutter/material.dart';
+import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
-class Global {
+late GlobalKey<NavigatorState> navigatorKey  = GlobalKey<NavigatorState>();
 
-  BaseOptions options = BaseOptions(
-    baseUrl: dotenv.env['API_URL']!,
-    receiveDataWhenStatusError: true,
-    connectTimeout: const Duration(seconds: 90), // Use Duration for better readability
-  );
+  // BaseOptions options = BaseOptions(
+  //   baseUrl: dotenv.env['API_URL']!,
+  //   receiveDataWhenStatusError: true,
+  //   connectTimeout: const Duration(seconds: 90), // Use Duration for better readability
+  // );
 
 
 
   // DIO
-  // var dio = Dio(options);
-}
+  var dio = Dio();
+
+const secureStorage = FlutterSecureStorage();

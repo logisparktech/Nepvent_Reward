@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 
 class VendorLimitedOfferWidget extends StatelessWidget {
-  final String discount;
+  final int discount;
   final String vendorName;
   final String imageUrl;
 
@@ -35,11 +35,11 @@ class VendorLimitedOfferWidget extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color: Colors.red,
+                color:Color(0xFFDD143D),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
-                '$discount Off',
+                '$discount% Off',
                 style: TextStyle(
                   color: Colors.white,
                   fontWeight: FontWeight.bold,
@@ -67,36 +67,7 @@ class VendorLimitedOfferWidget extends StatelessWidget {
               ),
             ),
           ),
-          // Left Arrow
-          // Positioned(
-          //   left: 0,
-          //   top: 0,
-          //   bottom: 0,
-          //   child: IconButton(
-          //     icon: Icon(
-          //       Icons.arrow_back_ios,
-          //       color: Colors.red,
-          //     ),
-          //     onPressed: () {
-          //       // Add left arrow functionality if needed
-          //     },
-          //   ),
-          // ),
-          // // Right Arrow
-          // Positioned(
-          //   right: 0,
-          //   top: 0,
-          //   bottom: 0,
-          //   child: IconButton(
-          //     icon: Icon(
-          //       Icons.arrow_forward_ios,
-          //       color: Colors.red,
-          //     ),
-          //     onPressed: () {
-          //       // Add right arrow functionality if needed
-          //     },
-          //   ),
-          // ),
+
         ],
       ),
     );

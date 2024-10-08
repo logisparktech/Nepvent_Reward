@@ -1,6 +1,6 @@
-class HomePageBanner {
+class BannerModel {
   final String url;
   final String imageUrl;
 
-  HomePageBanner({required this.url, required this.imageUrl});
+  BannerModel({required this.url, required this.imageUrl});
 }

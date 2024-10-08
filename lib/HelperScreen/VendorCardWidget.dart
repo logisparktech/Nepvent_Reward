@@ -1,12 +1,12 @@
 import 'package:flutter/material.dart';
 
-class VendorWidget extends StatelessWidget {
+class VendorCardWidget extends StatelessWidget {
   final int discount;
   final String vendorName;
   final String imageUrl;
   final String address; // Added address property
 
-  const VendorWidget({
+  const VendorCardWidget({
     super.key,
     required this.discount,
     required this.vendorName,
@@ -65,6 +65,7 @@ class VendorWidget extends StatelessWidget {
               vendorName,
               textAlign: TextAlign.start,
               style: TextStyle(
+                fontSize: 16,
                 fontWeight: FontWeight.w600
               ),
             ),
@@ -78,7 +79,7 @@ class VendorWidget extends StatelessWidget {
               address,
               textAlign: TextAlign.start,
               style: TextStyle(
-                fontWeight: FontWeight.w600
+                fontWeight: FontWeight.w400
               ),
             ),
           ),
