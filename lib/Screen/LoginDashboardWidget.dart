@@ -91,8 +91,12 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                   _title[_selectedIndex],
                 ),
           actions: [
-            isWeb
-                ? PopupMenuButton(
+            Padding(
+              padding: const EdgeInsets.only(right: 24),
+              child: Row(
+                children: [
+                  isWeb
+                      ? PopupMenuButton(
                     onSelected: (String value) {
                       if (value == 'Home') {
                         Navigator.push(
@@ -143,34 +147,42 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                     },
                     child: Icon(Icons.menu_sharp),
                   )
-                : const Material(),
-            isWeb
-                ? Padding(
-                    padding: const EdgeInsets.all(8.0),
-                    child: OutlinedButton(
-                      onPressed: () {
-                        // Your login logic here
+                      : const Material(),
+                  isWeb
+                      ? Padding(
+                      padding: const EdgeInsets.all(8.0),
+                      child:CircleAvatar(
+                        backgroundImage: NetworkImage("https://res.cloudinary.com/dslj7klen/image/upload/v1727283244/ojzy5ahd7ci8wonknj5a.jpg"),
+                      )
 
-                        // debugPrint("Login Clicked")
-                      },
-                      style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.red[200],
-                        foregroundColor: Colors.redAccent[400],
-                        padding: const EdgeInsets.symmetric(
-                          horizontal: 24,
-                          vertical: 12,
-                        ),
-                        shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
-                        ),
-                        side: const BorderSide(
-                          color: Color(0xFFD50032),
-                        ),
-                      ),
-                      child: const Text("Get Started"),
-                    ),
+                    // OutlinedButton(
+                    //   onPressed: () {
+                    //     // Your login logic here
+                    //
+                    //     debugPrint("Login Dashboard Clicked.");
+                    //   },
+                    //   style: ElevatedButton.styleFrom(
+                    //     backgroundColor: Colors.red[200],
+                    //     foregroundColor: Colors.redAccent[400],
+                    //     padding: const EdgeInsets.symmetric(
+                    //       horizontal: 24,
+                    //       vertical: 12,
+                    //     ),
+                    //     shape: RoundedRectangleBorder(
+                    //       borderRadius: BorderRadius.circular(8),
+                    //     ),
+                    //     side: const BorderSide(
+                    //       color: Color(0xFFD50032),
+                    //     ),
+                    //   ),
+                    //   child: const Text("Get Started"),
+                    // ),
                   )
-                : Material(),
+                      : Material(),
+                ],
+              ),
+            ),
+
           ],
         ),
         body: _pages[_selectedIndex],

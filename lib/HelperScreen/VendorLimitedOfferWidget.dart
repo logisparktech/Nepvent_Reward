@@ -1,3 +1,4 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 
 class VendorLimitedOfferWidget extends StatelessWidget {
@@ -21,11 +22,27 @@ class VendorLimitedOfferWidget extends StatelessWidget {
           // Background Image
           ClipRRect(
             borderRadius: BorderRadius.circular(16),
-            child: Image.network(
-              imageUrl,
-              fit: BoxFit.cover,
+            child: SizedBox(
               width: double.infinity,
               height: double.infinity,
+              child: CachedNetworkImage(
+                imageUrl: imageUrl,
+                imageBuilder: (context, imageProvider) => Container(
+                  decoration: BoxDecoration(
+                    image: DecorationImage(
+                      image: imageProvider,
+                      fit: BoxFit.cover,
+                    ),
+                  ),
+                ),
+                placeholder: (context, url) => Center(
+                  child: Transform.scale(
+                    scale: 0.8,
+                    child: CircularProgressIndicator(),
+                  ),
+                ),
+                errorWidget: (context, url, error) => Icon(Icons.error),
+              ),
             ),
           ),
           // Discount Tag
@@ -35,7 +52,7 @@ class VendorLimitedOfferWidget extends StatelessWidget {
             child: Container(
               padding: EdgeInsets.symmetric(horizontal: 8, vertical: 4),
               decoration: BoxDecoration(
-                color:Color(0xFFDD143D),
+                color: Color(0xFFDD143D),
                 borderRadius: BorderRadius.circular(8),
               ),
               child: Text(
@@ -67,7 +84,6 @@ class VendorLimitedOfferWidget extends StatelessWidget {
               ),
             ),
           ),
-
         ],
       ),
     );

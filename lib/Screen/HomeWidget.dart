@@ -1,8 +1,9 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:nepvent_reward/HelperScreen/VendorLimitedOfferWidget.dart';
 import 'package:nepvent_reward/HelperScreen/VendorCardWidget.dart';
+import 'package:nepvent_reward/HelperScreen/VendorLimitedOfferWidget.dart';
 import 'package:nepvent_reward/Model/BannerModel.dart';
 import 'package:nepvent_reward/Model/VendorModel.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
@@ -302,31 +303,46 @@ class _HomeWidgetState extends State<HomeWidget> {
       children: [
         CarouselSlider(
           items: bannerData
-              .map((item) => GestureDetector(
-                    onTap: () async {
-                      // Open URL when tapped
-                      final Uri uri = Uri.parse(item.url);
-                      if (!await launchUrl(
-                        uri,
-                        mode: LaunchMode.platformDefault,
-                        // Open in external browser
-                        webViewConfiguration: const WebViewConfiguration(
-                          enableJavaScript: true,
-                          enableDomStorage: true,
-                        ),
-                      )) {
-                        throw Exception('Could not launch ${item.url}');
-                      }
-                    },
-                    child: SizedBox(
-                      width: MediaQuery.sizeOf(context).width,
-                      child: Image.network(
-                        item.imageUrl,
-                        fit: BoxFit.cover,
-                        width: 1000,
+              .map(
+                (item) => GestureDetector(
+                  onTap: () async {
+                    // Open URL when tapped
+                    final Uri uri = Uri.parse(item.url);
+                    if (!await launchUrl(
+                      uri,
+                      mode: LaunchMode.platformDefault,
+                      // Open in external browser
+                      webViewConfiguration: const WebViewConfiguration(
+                        enableJavaScript: true,
+                        enableDomStorage: true,
                       ),
+                    )) {
+                      throw Exception('Could not launch ${item.url}');
+                    }
+                  },
+                  child: SizedBox(
+                    width: MediaQuery.sizeOf(context).width,
+                    child: CachedNetworkImage(
+                      imageUrl: item.imageUrl,
+                      imageBuilder: (context, imageProvider) => Container(
+                        decoration: BoxDecoration(
+                          image: DecorationImage(
+                            image: imageProvider,
+                            fit: BoxFit.cover,
+                          ),
+                        ),
+                      ),
+                      placeholder: (context, url) => Center(
+                        child: Transform.scale(
+                          scale: 0.8,
+                          child: CircularProgressIndicator(),
+                        ),
+                      ),
+                      errorWidget: (context, url, error) => Icon(Icons.error),
                     ),
-                  ))
+                  ),
+                ),
+              )
               .toList(),
           options: CarouselOptions(
             height: height,
