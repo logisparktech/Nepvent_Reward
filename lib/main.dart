@@ -1,8 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
+import 'package:nepvent_reward/Check.dart';
 import 'package:nepvent_reward/Helper/AuthInterceptor.dart';
-import 'package:nepvent_reward/Screen/DashboardWidget.dart';
+import 'package:nepvent_reward/Provider/NepventProvider.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
@@ -21,14 +23,21 @@ class MyApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider<NepventProvider>(
+          create: (context) => NepventProvider(),
+        ),
+      ],
+      child: MaterialApp(
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const Check(),
+        navigatorKey: navigatorKey,
       ),
-      home: const DashboardWidget(),
-      navigatorKey: navigatorKey,
     );
   }
 }

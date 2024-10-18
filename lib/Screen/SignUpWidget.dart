@@ -77,7 +77,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const LoginDashboardWidget(
+            builder: (context) =>  LoginDashboardWidget(
               tabIndex: 0,
             ),
           ),

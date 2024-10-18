@@ -59,6 +59,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     try {
       final Response response = await dio.get(urls['banner']!);
       final body = response.data['data'];
+      // debugPrint("banner Body $body ");
 
       List<BannerModel> newBannerData = [];
       body['items'].forEach((item) {
@@ -69,9 +70,11 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
         );
       });
-      setState(() {
-        bannerData = newBannerData;
-      });
+      if(mounted) {
+        setState(() {
+          bannerData = newBannerData;
+        });
+      }
     } catch (e) {
       print("Error Fetching banner: $e");
     }
@@ -95,9 +98,11 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
         );
       });
-      setState(() {
-        limitedVendorData = newVendorData;
-      });
+      if(mounted) {
+        setState(() {
+          limitedVendorData = newVendorData;
+        });
+      }
     } catch (e) {
       print("Error Fetching limited vendor data: $e");
     }
@@ -122,9 +127,11 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
         );
       });
-      setState(() {
-        vendorData = newVendorData;
-      });
+      if(mounted) {
+        setState(() {
+          vendorData = newVendorData;
+        });
+      }
     } catch (e) {
       print("Error Fetching  vendor data: $e");
     }

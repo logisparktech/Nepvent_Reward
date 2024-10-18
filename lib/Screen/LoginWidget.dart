@@ -1,7 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
-import 'package:nepvent_reward/Screen/LoginDashboardWidget.dart';
+import 'package:nepvent_reward/Check.dart';
 import 'package:nepvent_reward/Screen/SignUpWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
@@ -49,16 +49,27 @@ class _LoginWidgetState extends State<LoginWidget> {
       debugPrint(response.statusMessage);
       if (response.statusCode == 201) {
         var token = response.data['data']['token'];
-        await secureStorage.write(key: 'token', value: token);
-        await secureStorage.write(
-            key: 'userID', value: response.data['data']['id'].toString());
 
+        await secureStorage.write(
+          key: 'token',
+          value: token,
+        );
+        await secureStorage.write(
+          key: 'userID',
+          value: response.data['data']['id'].toString(),
+        );
+        if (response.data['data']?.containsKey('displayPicture') == true &&
+            response.data['data']['displayPicture']?.containsKey('url') ==
+                true) {
+          await secureStorage.write(
+            key: 'ProfilePic',
+            value: response.data['data']['displayPicture']['url'].toString(),
+          );
+        }
         Navigator.push(
           context,
           MaterialPageRoute(
-            builder: (context) => const LoginDashboardWidget(
-              tabIndex: 0,
-            ),
+            builder: (context) => const Check(),
           ),
         );
       } else {
@@ -309,11 +320,11 @@ class _LoginWidgetState extends State<LoginWidget> {
                                           const EdgeInsetsDirectional.fromSTEB(
                                               15, 15, 15, 5),
                                       child: ElevatedButton(
-                                        onPressed: () async {
+                                        onPressed: () {
                                           // Your onPressed logic
                                           if (_formKey.currentState!
                                               .validate()) {
-                                            await _login();
+                                            _login();
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(

@@ -5,4 +5,7 @@ final Map<String, String> urls = {
   'AllVendor': 'api/vendors?limit=20',
   'login': 'api/auth/login/Customer',
   'register': 'api/auth/register',
+  'profile' : 'api/users',
+  'updateUser' : ' api/users',
+  'profilePicture': 'api/assets/upload?useAsDisplayPicture=true'
 };
