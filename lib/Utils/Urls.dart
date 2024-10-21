@@ -7,5 +7,6 @@ final Map<String, String> urls = {
   'register': 'api/auth/register',
   'profile' : 'api/users',
   'updateUser' : ' api/users',
-  'profilePicture': 'api/assets/upload?useAsDisplayPicture=true'
+  'profilePicture': 'api/assets/upload?useAsDisplayPicture=true',
+  'GetInvoice': 'api/invoice/customer',
 };

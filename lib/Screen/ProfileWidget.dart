@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nepvent_reward/Model/ProfileModel.dart';
+import 'package:nepvent_reward/Screen/DashboardWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
 
@@ -665,6 +666,44 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                           ),
                         ),
                       ),
+                      !kIsWeb
+                          ? Padding(
+                              padding: const EdgeInsets.only(top: 16.0 ,bottom: 16.0),
+                              child: ElevatedButton(
+                                onPressed: () async{
+                                  await secureStorage.deleteAll();
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => const DashboardWidget(
+                                        tabIndex: 0,
+                                      ),
+                                    ),
+                                  );
+                                },
+                                style: ElevatedButton.styleFrom(
+                                  backgroundColor: const Color(0xFFDD143D),
+                                  // Button color
+                                  shape: RoundedRectangleBorder(
+                                    borderRadius: BorderRadius.circular(
+                                        20), // Rounded edges
+                                  ),
+                                  padding: EdgeInsets.symmetric(
+                                      horizontal: 50,
+                                      vertical:
+                                          15), // Padding to enlarge the button
+                                ),
+                                child: Text(
+                                  'Logout',
+                                  style: TextStyle(
+                                    color: Colors.white, // Text color
+                                    fontSize: 16, // Font size
+                                    fontWeight: FontWeight.bold, // Bold text
+                                  ),
+                                ),
+                              ),
+                            )
+                          : Material(),
                     ],
                   ),
                 ),
