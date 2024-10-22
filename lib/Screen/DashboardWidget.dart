@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nepvent_reward/Screen/HomeWidget.dart';
+import 'package:nepvent_reward/Screen/LoginForWebWidget.dart';
 import 'package:nepvent_reward/Screen/LoginWidget.dart';
 import 'package:nepvent_reward/Screen/VendorWidget.dart';
 
@@ -45,6 +46,9 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       _selectedIndex = index;
     });
   }
+
+
+
 
   @override
   Widget build(BuildContext context) {
@@ -151,11 +155,17 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                     child: OutlinedButton(
                       onPressed: () {
                         // Your login logic here
-                        Navigator.push(
-                          context,
-                          MaterialPageRoute(
-                            builder: (context) => const LoginWidget(),
-                          ),
+                        // Navigator.push(
+                        //   context,
+                        //   MaterialPageRoute(
+                        //     builder: (context) => const LoginForWebWidget(),
+                        //   ),
+                        // );
+                        showDialog(
+                          context: context,
+                          builder: (BuildContext context) {
+                            return LoginForWebWidget();
+                          },
                         );
                         // debugPrint("Login Clicked")
                       },

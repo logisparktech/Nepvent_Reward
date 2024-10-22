@@ -25,6 +25,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
   var _isObscured;
   String? _selectedProvince;
   String? _selectedDistrict;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -73,12 +74,14 @@ class _SignUpWidgetState extends State<SignUpWidget> {
         var token = response.data['data']['token'];
         await secureStorage.write(key: 'token', value: token);
         await secureStorage.write(
-            key: 'userID', value: response.data['data']['id'].toString());
+            key: 'userID',
+            value: response.data['data']['user']['id'].toString());
         Navigator.push(
           context,
           MaterialPageRoute(
             builder: (context) =>  LoginDashboardWidget(
               tabIndex: 0,
+              profileUrl: '',
             ),
           ),
         );
@@ -725,9 +728,16 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              // Simulate a delay for submission (or replace with your async _submit function)
                               await _submit();
+
+                              setState(() {
+                                isLoading = false;
+                              });
                             }
-                            // Your onPressed logic here
                           },
                           style: ElevatedButton.styleFrom(
                             backgroundColor: const Color(0xFFD50032),
@@ -743,8 +753,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                               borderRadius: BorderRadius.circular(8),
                             ),
                           ),
-                          child: const Text(
-                            'Signup',
+                          child: isLoading
+                              ? const CircularProgressIndicator(
+                                  valueColor: AlwaysStoppedAnimation<Color>(
+                                      Colors.white),
+                                )
+                              : const Text(
+                                  'Signup',
                             style: TextStyle(
                               color: Colors.white,
                               fontWeight: FontWeight.w700,

@@ -39,17 +39,18 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Future<ProfileModel?> _fetchProfileData() async {
     String userID = await secureStorage.read(key: 'userID') ?? '';
     String profilePic = '';
-
     try {
       final Response response = await dio.get('${urls['profile']}/$userID');
       final body = response.data['data'];
 
-      var vendorLoyaltyPoints = body['vendorLoyaltyPoints'] as List;
-      int totalPoints = vendorLoyaltyPoints
-          .where((pointData) =>
-              pointData is Map && pointData.containsKey('points'))
-          .map((pointData) => pointData['points'] as int)
-          .fold(0, (sum, points) => sum + points);
+
+        var vendorLoyaltyPoints = body['vendorLoyaltyPoints'] as List;
+         int totalPoints = vendorLoyaltyPoints
+            .where((pointData) =>
+        pointData is Map && pointData.containsKey('points'))
+            .map((pointData) => pointData['points'] as int)
+            .fold(0, (sum, points) => sum + points);
+
 
       if (body['displayPicture']?.containsKey('url') == true) {
         profilePic = body['displayPicture']['url'].toString();
@@ -61,9 +62,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         email: body['email'],
         point: totalPoints,
         phone: body['phone'],
-        district: body['userDetail']['district'],
+        district: body['userDetail']['district']??'',
         address: body['userDetail']['address'],
-        province: body['userDetail']['province'],
+        province: body['userDetail']['province']??'',
         secondaryNumber: body['userDetail']['secondaryNumber'],
         avatarUrl: profilePic,
         memberId: body['membershipId'],
@@ -210,7 +211,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               (BuildContext context, AsyncSnapshot<ProfileModel?> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // While the future is loading
-              return Center(child: CircularProgressIndicator());
+              return Center(
+                child:  CircularProgressIndicator(
+                  color: const Color(0xFFDD143D),
+                ),
+              );
             } else if (snapshot.hasError) {
               // If there is an error
               return Center(child: Text('Error: ${snapshot.error}'));
@@ -556,6 +561,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                         padding:
                                             const EdgeInsets.only(top: 16.0),
                                         child: Row(
+
                                           children: [
                                             ElevatedButton(
                                               onPressed: () {
@@ -588,6 +594,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                                 ),
                                               ),
                                             ),
+
                                             SizedBox(
                                               width: 50,
                                             ),

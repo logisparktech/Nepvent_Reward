@@ -20,6 +20,7 @@ class _LoginWidgetState extends State<LoginWidget> {
   final numberController = TextEditingController();
   final passwordController = TextEditingController();
   var _isObscured;
+  bool isLoading = false;
 
   @override
   void initState() {
@@ -320,11 +321,19 @@ class _LoginWidgetState extends State<LoginWidget> {
                                           const EdgeInsetsDirectional.fromSTEB(
                                               15, 15, 15, 5),
                                       child: ElevatedButton(
-                                        onPressed: () {
-                                          // Your onPressed logic
+                                        onPressed: () async {
                                           if (_formKey.currentState!
                                               .validate()) {
-                                            _login();
+                                            setState(() {
+                                              isLoading = true;
+                                            });
+
+                                            // Call the login function (or any async operation)
+                                            await _login();
+
+                                            setState(() {
+                                              isLoading = false;
+                                            });
                                           }
                                         },
                                         style: ElevatedButton.styleFrom(
@@ -343,13 +352,19 @@ class _LoginWidgetState extends State<LoginWidget> {
                                                 BorderRadius.circular(8),
                                           ),
                                         ),
-                                        child: const Text(
-                                          'Login',
-                                          style: TextStyle(
-                                            color: Colors.white,
-                                            fontWeight: FontWeight.w700,
-                                          ),
-                                        ),
+                                        child: isLoading
+                                            ? const CircularProgressIndicator(
+                                                valueColor:
+                                                    AlwaysStoppedAnimation(
+                                                        Colors.white),
+                                              )
+                                            : const Text(
+                                                'Login',
+                                                style: TextStyle(
+                                                  color: Colors.white,
+                                                  fontWeight: FontWeight.w700,
+                                                ),
+                                              ),
                                       ),
                                     ),
                                     RichText(

@@ -23,6 +23,7 @@ class _VendorWidgetState extends State<VendorWidget> {
   late double cardHeight;
   String? _selectedFilter;
   String? _selectedOrder;
+  late bool _isLogin;
   List<VendorModel> filteredItems = [];
   List<VendorModel> vendorData = [];
 
@@ -31,20 +32,21 @@ class _VendorWidgetState extends State<VendorWidget> {
     // TODO: implement initState
     super.initState();
     _getVendorData();
+    _checkToken();
     searchController.addListener(() {
-      _searchFilterData();
+      setState(() {});
     });
   }
 
-  _getVendorData() async {
+  Future<List<VendorModel>> _getVendorData() async {
     try {
       Map<String, dynamic>? queryParams;
-      if (_selectedFilter != null && _selectedOrder!=null) {
+      if (_selectedFilter != null && _selectedOrder != null) {
         queryParams = {
           'sortKey': _selectedFilter,
           'sort': _selectedOrder,
         };
-      }else{
+      } else {
         queryParams = {
           'sortKey': _selectedFilter,
         };
@@ -67,35 +69,40 @@ class _VendorWidgetState extends State<VendorWidget> {
             discount: item['discount'],
             vendorName: item['name'],
             location: item['address'],
+            description: item['description'],
+            phone: item['phone'],
           ),
         );
       });
-      setState(() {
-        vendorData = newVendorData;
-        filteredItems = vendorData;
-      });
+      return newVendorData;
     } catch (e) {
-      print("Error Fetching  vendor data: $e");
+      print("Error Fetching vendor data: $e");
+      throw e; // Rethrow the error to handle it in FutureBuilder
     }
+  }
+  _checkToken() async {
+    var token = await secureStorage.read(key: 'token') ?? '';
+    _isLogin = token.isNotEmpty; // Set to true if token is not empty, false otherwise
   }
 
-  _searchFilterData() {
-    if (searchController.text.isNotEmpty) {
-      List<VendorModel> filteredList = vendorData
-          .where((vendor) => vendor.vendorName
-              .toLowerCase()
-              .contains(searchController.text.toLowerCase()))
-          .toList();
-      setState(() {
-        filteredItems = filteredList;
-      });
-    } else {
-      setState(() {
-        filteredItems =
-            vendorData; // Reset to original data when search text is empty
-      });
-    }
-  }
+  // _searchFilterData() {
+  //   if (searchController.text.isNotEmpty) {
+  //     List<VendorModel> filteredList = vendorData
+  //         .where((vendor) => vendor.vendorName
+  //             .toLowerCase()
+  //             .contains(searchController.text.toLowerCase()))
+  //         .toList();
+  //     setState(() {
+  //       filteredItems = filteredList;
+  //     });
+  //   } else {
+  //     setState(() {
+  //       filteredItems =
+  //           vendorData; // Reset to original data when search text is empty
+  //     });
+  //   }
+  // }
+
 
   @override
   void dispose() {
@@ -321,9 +328,9 @@ class _VendorWidgetState extends State<VendorWidget> {
                   controller: searchController,
                   autofocus: false,
                   obscureText: false,
-                  onChanged: (searchData) {
-                    _searchFilterData();
-                  },
+                  // onChanged: (searchData) {
+                  //   // _searchFilterData();
+                  // },
                   decoration: InputDecoration(
                     labelStyle: TextStyle(
                       fontFamily: 'Poppins',
@@ -417,30 +424,77 @@ class _VendorWidgetState extends State<VendorWidget> {
                   ),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.only(top: 16.0),
-                child: SizedBox(
-                    height:
-                    isMobile ? screen.height * 0.645 : screen.height * 0.76,
-                    child: SingleChildScrollView(
-                      child: Wrap(
-                        // spacing: 8.0, // Space between items horizontally
-                        runSpacing: 8.0, // Space between rows
-                        children: filteredItems.map((vendor) {
-                          return SizedBox(
-                            width: vendorCardWidth,
-                            // height: cardHeight,
-                            child: VendorCardWidget(
-                              discount: vendor.discount,
-                              vendorName: vendor.vendorName,
-                              imageUrl: vendor.imageUrl,
-                              address: vendor.location,
-                            ),
-                          );
-                        }).toList(),
-                      ),
-                    )),
-              )
+
+              Expanded(
+                child: FutureBuilder<List<VendorModel>>(
+                  future: _getVendorData(),
+                  builder: (context, snapshot) {
+                    if (snapshot.connectionState == ConnectionState.waiting) {
+                      return Center(
+                        child: CircularProgressIndicator(
+                          color: const Color(0xFFDD143D),
+                        ),
+                      );
+                    } else if (snapshot.hasError) {
+                      return Center(child: Text('Error: ${snapshot.error}'));
+                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
+                      return Center(child: Text('No vendors found.'));
+                    } else {
+                      // Filter the data based on the search input
+                      List<VendorModel> filteredItems = snapshot.data!
+                          .where((vendor) => vendor.vendorName
+                              .toLowerCase()
+                              .contains(searchController.text.toLowerCase()))
+                          .toList();
+
+                      return SingleChildScrollView(
+                        child: Wrap(
+                          runSpacing: 8.0,
+                          children: filteredItems.map((vendor) {
+                            return SizedBox(
+                              width: vendorCardWidth,
+                              child: VendorCardWidget(
+                                discount: vendor.discount,
+                                vendorName: vendor.vendorName,
+                                imageUrl: vendor.imageUrl,
+                                address: vendor.location,
+                                description: vendor.description,
+                                phone: vendor.phone,
+                                isLogin: _isLogin,
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                      );
+                    }
+                  },
+                ),
+              ),
+              // Padding(
+              //   padding: const EdgeInsets.only(top: 16.0),
+              //   child: SizedBox(
+              //       height:
+              //       isMobile ? screen.height * 0.645 : screen.height * 0.76,
+              //       child: SingleChildScrollView(
+              //         child: Wrap(
+              //           // spacing: 8.0, // Space between items horizontally
+              //           runSpacing: 8.0, // Space between rows
+              //           children: filteredItems.map((vendor) {
+              //             return SizedBox(
+              //               width: vendorCardWidth,
+              //               // height: cardHeight,
+              //               child: VendorCardWidget(
+              //                 discount: vendor.discount,
+              //                 vendorName: vendor.vendorName,
+              //                 imageUrl: vendor.imageUrl,
+              //                 address: vendor.location,
+              //               ),
+              //             );
+              //           }).toList(),
+              //         ),
+              //     ),
+              //   ),
+              // )
             ],
           ),
         ),

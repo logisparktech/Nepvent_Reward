@@ -68,7 +68,11 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
               (BuildContext context, AsyncSnapshot<ProfileModel?> snapshot) {
             if (snapshot.connectionState == ConnectionState.waiting) {
               // While the future is loading
-              return Center(child: CircularProgressIndicator());
+              return Center(
+                child:  CircularProgressIndicator(
+                  color: const Color(0xFFDD143D),
+                ),
+              );
             } else if (snapshot.hasError) {
               // If there is an error
               return Center(child: Text('Error: ${snapshot.error}'));

@@ -13,7 +13,7 @@ class AuthInterceptor extends Interceptor {
     RequestInterceptorHandler handler,
   ) async {
     // TODO: implement onRequest
-
+    print('** Request Form AuthInterceptor **: ${options.uri}');
     try {
       //Define here url who don't require JWT Token
       final listOfPaths = <String>[
@@ -34,6 +34,7 @@ class AuthInterceptor extends Interceptor {
 
       // Load your token here and pass to the header
       options.headers.addAll({'Authorization': 'Bearer $token'});
+
       return handler.next(options);
     } on PlatformException catch (error) {
       await secureStorage.deleteAll();

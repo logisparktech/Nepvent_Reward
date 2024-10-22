@@ -17,6 +17,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
 
   List<VendorModel> vendorName = [];
   List<InvoiceModel> invoiceData = [];
+  List<InvoiceModel> filterInvoiceData = [];
 
   @override
   void initState() {
@@ -38,6 +39,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
             discount: item['discount'],
             vendorName: item['name'],
             location: item['address'],
+            description: '', phone: '',
           ),
         );
       });
@@ -74,6 +76,18 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
     }
   }
 
+  _updateFilteredVendor() {
+    if (_selectedVendorName == null) {
+      filterInvoiceData = invoiceData;
+    } else {
+      filterInvoiceData = invoiceData
+          .where((element) =>
+              element.vendorName.toLowerCase() ==
+              _selectedVendorName!.toLowerCase())
+          .toList();
+    }
+  }
+
   @override
   void dispose() {
     // TODO: implement dispose
@@ -82,6 +96,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
 
   @override
   Widget build(BuildContext context) {
+    _updateFilteredVendor();
     Size screen = MediaQuery.sizeOf(context);
     bool isWeb = screen.width >= 900;
     return Scaffold(
@@ -154,7 +169,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: invoiceData == null && invoiceData.isEmpty
+            child: filterInvoiceData == null || filterInvoiceData.isEmpty
                 ? Center(
                     child: Column(
                       children: [
@@ -227,7 +242,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
             ),
           ),
         ],
-        rows: invoiceData.map((invoice) {
+        rows: filterInvoiceData.map((invoice) {
           debugPrint('${invoice.tableName}');
           return DataRow(
             cells: [
@@ -254,9 +269,9 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
     return SizedBox(
       height: screen.height / 1.41,
       child: ListView(
-        children: List.generate(invoiceData.length, (index) {
+        children: List.generate(filterInvoiceData.length, (index) {
           final invoice =
-              invoiceData[index]; // Get the invoice at the current index
+              filterInvoiceData[index]; // Get the invoice at the current index
           return Container(
             width: screen.width,
 

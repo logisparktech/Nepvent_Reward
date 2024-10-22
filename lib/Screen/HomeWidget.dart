@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nepvent_reward/HelperScreen/VendorCardWidget.dart';
 import 'package:nepvent_reward/HelperScreen/VendorLimitedOfferWidget.dart';
@@ -27,6 +28,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   late double childAspectRatio;
   late double vendorCardWidth;
   late double cardHeight;
+  late bool _isLogin;
   List<BannerModel> bannerData = [];
   List<VendorModel> limitedVendorData = [];
   List<VendorModel> vendorData = [];
@@ -42,10 +44,11 @@ class _HomeWidgetState extends State<HomeWidget> {
     super.dispose();
   }
 
-  _callAPI() async {
-    await _getBannerData();
-    await _getLimitVendorData();
-    await _getVendorData();
+  _callAPI() {
+    _getBannerData();
+    _getLimitVendorData();
+    _getVendorData();
+    _checkToken();
   }
 
   void _onDotTap(int index) {
@@ -70,11 +73,10 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
         );
       });
-      if(mounted) {
-        setState(() {
+
+      setState(() {
           bannerData = newBannerData;
         });
-      }
     } catch (e) {
       print("Error Fetching banner: $e");
     }
@@ -92,17 +94,18 @@ class _HomeWidgetState extends State<HomeWidget> {
         newVendorData.add(
           VendorModel(
             imageUrl: imageUrl,
-            discount: item['discount'],
+            discount: item['discount'] as int,
             vendorName: item['name'],
             location: item['address'],
+            description: item['description'],
+            phone: item['phone'],
           ),
         );
       });
-      if(mounted) {
-        setState(() {
+
+      setState(() {
           limitedVendorData = newVendorData;
         });
-      }
     } catch (e) {
       print("Error Fetching limited vendor data: $e");
     }
@@ -121,20 +124,27 @@ class _HomeWidgetState extends State<HomeWidget> {
         newVendorData.add(
           VendorModel(
             imageUrl: imageUrl,
-            discount: item['discount'],
+            discount: item['discount'] as int,
             vendorName: item['name'],
             location: item['address'],
+            description: item['description'],
+            phone: item['phone'],
           ),
         );
       });
-      if(mounted) {
-        setState(() {
+
+      setState(() {
           vendorData = newVendorData;
         });
-      }
     } catch (e) {
       print("Error Fetching  vendor data: $e");
     }
+  }
+
+  _checkToken() async {
+    var token = await secureStorage.read(key: 'token') ?? '';
+    _isLogin =
+        token.isNotEmpty; // Set to true if token is not empty, false otherwise
   }
 
   @override
@@ -206,42 +216,144 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ),
 
                   // Adjust width based on the number of cards
-                  SizedBox(
-                    height: isMobile ? 180 : 250,
-                    child: GestureDetector(
-                      // this code for scrolling in web
-                      onHorizontalDragUpdate: (details) {
-                        // Scroll the list based on swipe gesture
-                        if (_scrollController.hasClients) {
-                          _scrollController.jumpTo(
-                            _scrollController.offset - details.delta.dx,
-                          );
-                        }
-                      },
-                      child: ListView.builder(
-                        controller: _scrollController,
-                        scrollDirection: Axis.horizontal,
-                        itemCount: limitedVendorData.length,
-                        physics: const ClampingScrollPhysics(),
-                        itemBuilder: (context, index) {
-                          return SizedBox(
-                            width: cardWidth,
-                            child: VendorLimitedOfferWidget(
-                              discount: limitedVendorData[index].discount,
-                              vendorName: limitedVendorData[index].vendorName,
-                              imageUrl: limitedVendorData[index].imageUrl,
+                  kIsWeb
+                      ? Stack(
+                          children: [
+                            SizedBox(
+                              height: isMobile ? 180 : 250,
+                              child: GestureDetector(
+                                // this code for scrolling in web
+                                onHorizontalDragUpdate: (details) {
+                                  // Scroll the list based on swipe gesture
+                                  if (_scrollController.hasClients) {
+                                    _scrollController.jumpTo(
+                                      _scrollController.offset -
+                                          details.delta.dx,
+                                    );
+                                  }
+                                },
+                                child: ListView.builder(
+                                  controller: _scrollController,
+                                  scrollDirection: Axis.horizontal,
+                                  itemCount: limitedVendorData.length,
+                                  physics: const ClampingScrollPhysics(),
+                                  itemBuilder: (context, index) {
+                                    return SizedBox(
+                                      width: cardWidth,
+                                      child: VendorLimitedOfferWidget(
+                                        discount:
+                                            limitedVendorData[index].discount,
+                                        vendorName:
+                                            limitedVendorData[index].vendorName,
+                                        imageUrl:
+                                            limitedVendorData[index].imageUrl,
+                                      ),
+                                    );
+                                  },
+                                ),
+                              ),
                             ),
-                          );
-                        },
-                      ),
-                    ),
-                  ),
+                            Positioned(
+                              top: (isMobile ? 180 : 250) / 2 - 24,
+                              left: 8,
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFDD143D),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (_scrollController.hasClients) {
+                                      _scrollController.jumpTo(
+                                        (_scrollController.offset + cardWidth)
+                                            .clamp(
+                                          0.0,
+                                          _scrollController
+                                              .position.maxScrollExtent,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.arrow_back_ios,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                            Positioned(
+                              top: (isMobile ? 180 : 250) / 2 - 24,
+                              // Adjusting for vertical centering (24 is half the height of the button)
+                              right: 8,
+                              // Adjusting the left position for the forward button
+                              child: Container(
+                                padding: EdgeInsets.symmetric(
+                                    horizontal: 8, vertical: 4),
+                                decoration: BoxDecoration(
+                                  color: Color(0xFFDD143D),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                child: IconButton(
+                                  onPressed: () {
+                                    if (_scrollController.hasClients) {
+                                      _scrollController.jumpTo(
+                                        (_scrollController.offset - cardWidth)
+                                            .clamp(
+                                          0.0,
+                                          _scrollController
+                                              .position.maxScrollExtent,
+                                        ),
+                                      );
+                                    }
+                                  },
+                                  icon: Icon(
+                                    Icons.arrow_forward_ios,
+                                    color: Colors.white,
+                                  ),
+                                ),
+                              ),
+                            ),
+                          ],
+                        )
+                      : SizedBox(
+                          height: isMobile ? 180 : 250,
+                          child: GestureDetector(
+                            // this code for scrolling in web
+                            onHorizontalDragUpdate: (details) {
+                              // Scroll the list based on swipe gesture
+                              if (_scrollController.hasClients) {
+                                _scrollController.jumpTo(
+                                  _scrollController.offset - details.delta.dx,
+                                );
+                              }
+                            },
+                            child: ListView.builder(
+                              controller: _scrollController,
+                              scrollDirection: Axis.horizontal,
+                              itemCount: limitedVendorData.length,
+                              physics: const ClampingScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                return SizedBox(
+                                  width: cardWidth,
+                                  child: VendorLimitedOfferWidget(
+                                    discount: limitedVendorData[index].discount,
+                                    vendorName:
+                                        limitedVendorData[index].vendorName,
+                                    imageUrl: limitedVendorData[index].imageUrl,
+                                  ),
+                                );
+                              },
+                            ),
+                          ),
+                        ),
 
                   Padding(
                     padding: const EdgeInsets.only(top: 16.0),
                     child: SizedBox(
                       height:
-                          isMobile ? screen.height / 2.7 : screen.height / 1.15,
+                          isMobile ? screen.height / 2.7 : screen.height / 1.6,
                       child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
@@ -268,7 +380,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                             child: SizedBox(
                                 height: isMobile
                                     ? screen.height / 3.13
-                                    : screen.height * 0.8,
+                                    : screen.height * 0.55,
                                 child: SingleChildScrollView(
                                   child: Wrap(
                                     // spacing: 8.0, // Space between items horizontally
@@ -282,6 +394,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                                           vendorName: vendor.vendorName,
                                           imageUrl: vendor.imageUrl,
                                           address: vendor.location,
+                                          description: vendor.description,
+                                          phone: vendor.phone,
+                                          isLogin: _isLogin,
                                         ),
                                       );
                                     }).toList(),
@@ -342,7 +457,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                       placeholder: (context, url) => Center(
                         child: Transform.scale(
                           scale: 0.8,
-                          child: CircularProgressIndicator(),
+                          child: CircularProgressIndicator(
+                            color: const Color(0xFFDD143D),
+                          ),
                         ),
                       ),
                       errorWidget: (context, url, error) => Icon(Icons.error),
