@@ -204,6 +204,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: FutureBuilder<ProfileModel?>(
           future: _fetchProfileData(), // Call the future method
@@ -323,7 +324,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         child: Container(
                           decoration: BoxDecoration(
                             // color: Colors.greenAccent,
-                            border: Border.all(color: Colors.grey),
+                            border: Border.all(
+                              color: Color(0xFFD2D7DE),
+                            ),
                             borderRadius: BorderRadius.circular(8),
                           ),
                           child: Padding(
@@ -366,7 +369,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                         child: Container(
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.grey,
+                              color: Color(0xFFD2D7DE),
                             ),
                             borderRadius: BorderRadius.circular(8),
                           ),

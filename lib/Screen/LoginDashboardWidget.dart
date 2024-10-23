@@ -96,7 +96,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
 
       return Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.grey[300],
+          backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           title: isWeb
               ? Row(
@@ -104,7 +104,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                     Image.asset(
                       'assets/images/nepvent-red-logo.png',
                       // Path to your logo image
-                      height: 40, // Set the height of the logo
+                      height: 60, // Set the height of the logo
                     ),
                   ],
                 )
@@ -315,6 +315,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
         body: _pages[_selectedIndex],
         bottomNavigationBar: isMobile || isTablet
             ? BottomNavigationBar(
+              backgroundColor: Colors.white,
                 items: const <BottomNavigationBarItem>[
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),

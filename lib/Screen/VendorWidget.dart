@@ -316,6 +316,7 @@ class _VendorWidgetState extends State<VendorWidget> {
         // FilterDrawerWidget(
         //   scaffoldKey: _scaffoldKey,
         // ),
+        backgroundColor: Colors.white,
         body: SafeArea(
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
@@ -324,7 +325,7 @@ class _VendorWidgetState extends State<VendorWidget> {
               Padding(
                 padding: const EdgeInsets.only(
                     top: 16.0, bottom: 8.0, right: 8.0, left: 8.0),
-                child: TextFormField(
+                child:TextFormField(
                   controller: searchController,
                   autofocus: false,
                   obscureText: false,
@@ -336,18 +337,15 @@ class _VendorWidgetState extends State<VendorWidget> {
                       fontFamily: 'Poppins',
                       fontSize: 16,
                     ),
-
                     hintText: 'Search Vendor',
                     hintStyle: TextStyle(
                       fontFamily: 'Poppins',
-                      color: const Color(0xFF57636C),
                       fontSize: 14,
                       fontWeight: FontWeight.w600,
                     ),
-
                     enabledBorder: OutlineInputBorder(
                       borderSide: const BorderSide(
-                        color: Color(0x00000000),
+                        color: Color(0xFFD2D7DE),
                         width: 2,
                       ),
                       borderRadius: BorderRadius.circular(8),
@@ -374,19 +372,22 @@ class _VendorWidgetState extends State<VendorWidget> {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     filled: true,
-                    // fillColor: const Color(0xFF22222E),
-                    prefixIcon: Icon(Icons.search, color: Colors.grey),
+                    fillColor: Colors.white, // Set background color to white
+                    prefixIcon: Icon(
+                      Icons.search,
+                      color: Colors.grey,
+                    ),
                   ),
                   style: TextStyle(
                     fontFamily: 'Poppins',
-                    color: const Color(0xFF57636C),
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                   ),
                 ),
+
               ),
               Padding(
-                padding: const EdgeInsets.only(left: 8.0),
+                padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
                 child: Container(
                   alignment: Alignment.topLeft,
                   width: 100, // Set the button width

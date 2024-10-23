@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:nepvent_reward/Screen/HomeWidget.dart';
-import 'package:nepvent_reward/Screen/LoginForWebWidget.dart';
+import 'package:nepvent_reward/Screen/Web/LoginForWebWidget.dart';
 import 'package:nepvent_reward/Screen/LoginWidget.dart';
 import 'package:nepvent_reward/Screen/VendorWidget.dart';
 
@@ -79,8 +79,11 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       }
 
       return Scaffold(
-        appBar: AppBar(
-          backgroundColor: Colors.grey[300],
+        appBar: 
+
+
+        AppBar(
+          backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           title: isWeb
               ? Row(
@@ -171,7 +174,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                       },
                       style: ElevatedButton.styleFrom(
                         backgroundColor: Colors.red[200],
-                        foregroundColor: Colors.redAccent[400],
+                        foregroundColor: Color(0xFFD50032),
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
@@ -183,7 +186,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           color: Color(0xFFD50032),
                         ),
                       ),
-                      child: const Text("Get Started"),
+                      child: const Text("Get Started",style: TextStyle(fontFamily: 'poppiens'),),
                     ),
                   )
                 : Padding(
@@ -199,14 +202,14 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         );
                       },
                       style: ElevatedButton.styleFrom(
-                        backgroundColor: Colors.redAccent[400],
+                        backgroundColor:  Color(0xFFD50032),
                         foregroundColor: Colors.white,
                         padding: const EdgeInsets.symmetric(
                           horizontal: 24,
                           vertical: 12,
                         ),
                         shape: RoundedRectangleBorder(
-                          borderRadius: BorderRadius.circular(8),
+                          borderRadius: BorderRadius.circular(4),
                         ),
                         elevation: 5, // Shadow effect
                       ),
@@ -218,6 +221,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         body: _pages[_selectedIndex],
         bottomNavigationBar: isMobile || isTablet
             ? BottomNavigationBar(
+          backgroundColor: Colors.white,
                 items: const <BottomNavigationBarItem>[
                   BottomNavigationBarItem(
                     icon: Icon(Icons.home),
@@ -229,7 +233,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                   ),
                 ],
                 currentIndex: _selectedIndex,
-                selectedItemColor: Colors.amber[800],
+                selectedItemColor:  Color(0xFFD50032),
                 onTap: _onItemTapped,
               )
             : const Material(),

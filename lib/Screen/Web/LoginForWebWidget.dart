@@ -2,7 +2,7 @@ import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:nepvent_reward/Check.dart';
-import 'package:nepvent_reward/Screen/SignUpWidget.dart';
+import 'package:nepvent_reward/Screen/Web/SignUpForWeb.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
 
@@ -15,6 +15,8 @@ class LoginForWebWidget extends StatefulWidget {
 
 class _LoginForWebWidgetState extends State<LoginForWebWidget> {
   bool isLoading = false;
+  bool remamberMe = false;
+
   final numberController = TextEditingController();
   final passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
@@ -132,7 +134,6 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                 height: screen.height / 2,
               ),
             ),
-            
             Expanded(
               child: Padding(
                 padding:
@@ -161,13 +162,18 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: const [
-                        Icon(Icons.person, color: Colors.black, size: 24),
+                        Icon(
+                          Icons.person,
+                          color: Colors.black,
+                          size: 24,
+                        ),
                         SizedBox(width: 8),
                         Text(
                           'Login',
                           style: TextStyle(
                             fontSize: 20,
                             fontWeight: FontWeight.w700,
+                            fontFamily: 'Poppins',
                           ),
                         ),
                       ],
@@ -188,6 +194,19 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                                 keyboardType: TextInputType.number,
                                 decoration: InputDecoration(
                                   hintText: 'Phone Number',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                  labelText: 'Phone Number',
+                                  labelStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins',
+                                    fontSize: 16,
+                                  ),
+                                  floatingLabelBehavior:
+                                      FloatingLabelBehavior.auto,
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: const BorderSide(
                                       color: Colors.grey,
@@ -222,15 +241,18 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                                   ),
                                   errorStyle: const TextStyle(
                                     // Style for the error message
-                                    color: Colors.red,
+                                    color: Color(0xFFD50032),
                                     // Change color to red for error message
                                     fontSize: 12, // Adjust font size as needed
                                   ),
                                 ),
                                 style: const TextStyle(
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
+                                  fontFamily: 'Poppins',
                                 ),
+                                onChanged: (input) {
+                                  _formKey.currentState!.validate();
+                                },
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your phone number';
@@ -251,6 +273,19 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                                 obscureText: _isObscured,
                                 decoration: InputDecoration(
                                   hintText: 'Password',
+                                  hintStyle: TextStyle(
+                                    color: Colors.grey[500],
+                                    fontSize: 14,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                  labelText: 'Password',
+                                  labelStyle: TextStyle(
+                                    color: Colors.black,
+                                    fontFamily: 'Poppins',
+                                    fontSize: 16,
+                                  ),
+                                  floatingLabelBehavior:
+                                      FloatingLabelBehavior.auto,
                                   enabledBorder: OutlineInputBorder(
                                     borderSide: const BorderSide(
                                       color: Colors.grey,
@@ -285,7 +320,7 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                                   ),
                                   errorStyle: const TextStyle(
                                     // Style for the error message
-                                    color: Colors.red,
+                                    color: Color(0xFFD50032),
                                     // Change color to red for error message
                                     fontSize: 12, // Adjust font size as needed
                                   ),
@@ -302,9 +337,12 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                                   ),
                                 ),
                                 style: const TextStyle(
+                                  color: Colors.grey,
                                   fontSize: 16,
-                                  fontWeight: FontWeight.w600,
                                 ),
+                                onChanged: (input) {
+                                  _formKey.currentState!.validate();
+                                },
                                 validator: (value) {
                                   if (value == null || value.isEmpty) {
                                     return 'Please enter your password';
@@ -322,93 +360,124 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                     ),
 
                     // Remember Me Checkbox
-                    // Row(
-                    //   children: [
-                    //     Checkbox(
-                    //       value: false,
-                    //       onChanged: (newValue) {
-                    //         // Handle checkbox change
-                    //       },
-                    //     ),
-                    //     const Text('Remember me'),
-                    //   ],
-                    // ),
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 4.0, left: 10, right: 10),
+                      child: Row(
+                        children: [
+                          Checkbox(
+                            value: remamberMe,
+                            activeColor: Color(0xFFD50032),
+                            onChanged: (newValue) {
+                              // Handle checkbox change
+                              setState(() {
+                                remamberMe = newValue!;
+                              });
+                            },
+                          ),
+                          const Text(
+                            'Remember me',
+                            style: TextStyle(
+                              fontSize: 16,
+                              fontFamily: 'Poppins',
+                              fontWeight: FontWeight.w500,
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+
+                    Padding(
+                      padding:
+                          const EdgeInsets.only(top: 16.0, left: 10, right: 10),
+                      child: SizedBox(
+                        height: 45,
+                        child: ElevatedButton(
+                          onPressed: () async {
+                            if (_formKey.currentState!.validate()) {
+                              setState(() {
+                                isLoading = true;
+                              });
+                              await _login();
+                              setState(() {
+                                isLoading = false;
+                              });
+                            }
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFD50032),
+                            padding: const EdgeInsetsDirectional.fromSTEB(
+                                24, 0, 24, 0),
+                            minimumSize: Size(screen.width, 40),
+                            elevation: 2,
+                            side: const BorderSide(
+                              color: Color(0xFFD50032),
+                              width: 1,
+                            ),
+                            shape: RoundedRectangleBorder(
+                              borderRadius: BorderRadius.circular(8),
+                            ),
+                          ),
+                          child: isLoading
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: const CircularProgressIndicator(
+                                    valueColor:
+                                        AlwaysStoppedAnimation(Colors.white),
+                                  ),
+                                )
+                              : const Text(
+                                  'Login',
+                                  style: TextStyle(
+                                    color: Colors.white,
+                                    fontWeight: FontWeight.w700,
+                                    fontFamily: 'Poppins',
+                                  ),
+                                ),
+                        ),
+                      ),
+                    ),
 
                     Padding(
                       padding: const EdgeInsets.only(top: 16.0),
-                      child: ElevatedButton(
-                        onPressed: () async {
-                          if (_formKey.currentState!.validate()) {
-                            setState(() {
-                              isLoading = true;
-                            });
-                            await _login();
-                            setState(() {
-                              isLoading = false;
-                            });
-                          }
-                        },
-                        style: ElevatedButton.styleFrom(
-                          backgroundColor: const Color(0xFFD50032),
-                          padding: const EdgeInsetsDirectional.fromSTEB(
-                              24, 0, 24, 0),
-                          minimumSize: Size(screen.width, 40),
-                          elevation: 2,
-                          side: const BorderSide(
-                            color: Color(0xFFD50032),
-                            width: 1,
+                      child: RichText(
+                        text: TextSpan(
+                          text: "Don't have an account yet? ",
+                          style: TextStyle(
+                            color: Colors.grey[700],
+                            fontSize: 16,
+                            fontFamily: 'Poppins',
                           ),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                        ),
-                        child: isLoading
-                            ? SizedBox(
-                                width: 20,
-                                height: 20,
-                                child: const CircularProgressIndicator(
-                                  valueColor:
-                                      AlwaysStoppedAnimation(Colors.white),
-                                ),
-                              )
-                            : const Text(
-                                'Login',
-                                style: TextStyle(
-                                  color: Colors.white,
-                                  fontWeight: FontWeight.w700,
-                                ),
+                          children: [
+                            TextSpan(
+                              text: ' Register ',
+                              style: TextStyle(
+                                color: const Color(0xFFD50032),
+                                fontWeight: FontWeight.w700,
                               ),
-                      ),
-                    ),
-                    const SizedBox(height: 8),
-              
-                    RichText(
-                      text: TextSpan(
-                        text: "Don't have an account yet? ",
-                        style: TextStyle(color: Colors.grey[800]),
-                        children: [
-                          TextSpan(
-                            text: ' Register ',
-                            style: TextStyle(
-                              color: const Color(0xFFD50032),
-                              fontWeight: FontWeight.w700,
+                              recognizer: TapGestureRecognizer()
+                                ..onTap = () {
+                                  // handle the link tap
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) =>
+                                          const SignUpForWeb(),
+                                    ),
+                                  );
+                                },
                             ),
-                            recognizer: TapGestureRecognizer()
-                              ..onTap = () {
-                                // handle the link tap
-                                Navigator.push(
-                                  context,
-                                  MaterialPageRoute(
-                                    builder: (context) => const SignUpWidget(),
-                                  ),
-                                );
-                              },
-                          ),
-                          TextSpan(
-                            text: " here.",
-                            style: TextStyle(color: Colors.grey[800]),
-                          ),
-                        ],
+                            TextSpan(
+                              text: " here.",
+                              style: TextStyle(
+                                color: Colors.grey[700],
+                                fontSize: 16,
+                                fontFamily: 'Poppins',
+                              ),
+                            ),
+                          ],
+                        ),
                       ),
                     ),
                   ],

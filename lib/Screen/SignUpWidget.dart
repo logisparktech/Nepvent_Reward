@@ -139,9 +139,22 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           keyboardType: TextInputType.name,
                           decoration: InputDecoration(
                             hintText: 'Full Name',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                            labelText: 'Full Name',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                            ),
+                            floatingLabelBehavior:
+                            FloatingLabelBehavior.auto,
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD2D7DE),
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -156,7 +169,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             errorBorder: OutlineInputBorder(
                               // Optional: Keep same design for error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as enabled border
                                 width: 2,
                               ),
@@ -165,7 +178,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             focusedErrorBorder: OutlineInputBorder(
                               // Optional: Keep same design for focused error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as focused border
                                 width: 2,
                               ),
@@ -173,7 +186,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             ),
                             errorStyle: const TextStyle(
                               // Style for the error message
-                              color: Colors.red,
+                              color: Color(0xFFD50032),
                               // Change color to red for error message
                               fontSize: 12, // Adjust font size as needed
                             ),
@@ -182,6 +195,9 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
+                          onChanged: (input){
+                            _formKey.currentState!.validate();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your name';
@@ -204,9 +220,22 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           keyboardType: TextInputType.emailAddress,
                           decoration: InputDecoration(
                             hintText: 'Email',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                            labelText: 'Email',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                            ),
+                            floatingLabelBehavior:
+                            FloatingLabelBehavior.auto,
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD2D7DE),
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -221,7 +250,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             errorBorder: OutlineInputBorder(
                               // Optional: Keep same design for error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as enabled border
                                 width: 2,
                               ),
@@ -230,7 +259,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             focusedErrorBorder: OutlineInputBorder(
                               // Optional: Keep same design for focused error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as focused border
                                 width: 2,
                               ),
@@ -238,7 +267,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             ),
                             errorStyle: const TextStyle(
                               // Style for the error message
-                              color: Colors.red,
+                              color: Color(0xFFD50032),
                               // Change color to red for error message
                               fontSize: 12, // Adjust font size as needed
                             ),
@@ -247,6 +276,9 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
+                          onChanged: (input){
+                            _formKey.currentState!.validate();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your email';
@@ -269,9 +301,22 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           obscureText: _isObscured,
                           decoration: InputDecoration(
                             hintText: 'Password',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                            labelText: 'Password',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                            ),
+                            floatingLabelBehavior:
+                            FloatingLabelBehavior.auto,
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD2D7DE),
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -286,7 +331,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             errorBorder: OutlineInputBorder(
                               // Optional: Keep same design for error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as enabled border
                                 width: 2,
                               ),
@@ -295,7 +340,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             focusedErrorBorder: OutlineInputBorder(
                               // Optional: Keep same design for focused error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as focused border
                                 width: 2,
                               ),
@@ -303,7 +348,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             ),
                             errorStyle: const TextStyle(
                               // Style for the error message
-                              color: Colors.red,
+                              color: Color(0xFFD50032),
                               // Change color to red for error message
                               fontSize: 12, // Adjust font size as needed
                             ),
@@ -312,8 +357,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                   setState(() => _isObscured = !_isObscured),
                               child: Icon(
                                 _isObscured
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
                                 color: Color(0xFFD50032),
                                 size: 22,
                               ),
@@ -323,6 +368,9 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
+                          onChanged: (input){
+                            _formKey.currentState!.validate();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your password';
@@ -343,9 +391,22 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           obscureText: _isObscured,
                           decoration: InputDecoration(
                             hintText: 'Confirm Password',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                            labelText: 'Confirm Password',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                            ),
+                            floatingLabelBehavior:
+                            FloatingLabelBehavior.auto,
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD2D7DE),
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -360,7 +421,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             errorBorder: OutlineInputBorder(
                               // Optional: Keep same design for error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as enabled border
                                 width: 2,
                               ),
@@ -369,7 +430,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             focusedErrorBorder: OutlineInputBorder(
                               // Optional: Keep same design for focused error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as focused border
                                 width: 2,
                               ),
@@ -377,7 +438,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             ),
                             errorStyle: const TextStyle(
                               // Style for the error message
-                              color: Colors.red,
+                              color: Color(0xFFD50032),
                               // Change color to red for error message
                               fontSize: 12, // Adjust font size as needed
                             ),
@@ -386,8 +447,8 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                                   setState(() => _isObscured = !_isObscured),
                               child: Icon(
                                 _isObscured
-                                    ? Icons.visibility_outlined
-                                    : Icons.visibility_off_outlined,
+                                    ? Icons.visibility_off_outlined
+                                    : Icons.visibility_outlined,
                                 color: Color(0xFFD50032),
                                 size: 22,
                               ),
@@ -397,6 +458,9 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
+                          onChanged: (input){
+                            _formKey.currentState!.validate();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please confirm your password';
@@ -418,9 +482,22 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             hintText: 'Phone Number',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                            labelText: 'Phone Number',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                            ),
+                            floatingLabelBehavior:
+                            FloatingLabelBehavior.auto,
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD2D7DE),
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -435,7 +512,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             errorBorder: OutlineInputBorder(
                               // Optional: Keep same design for error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as enabled border
                                 width: 2,
                               ),
@@ -444,7 +521,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             focusedErrorBorder: OutlineInputBorder(
                               // Optional: Keep same design for focused error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as focused border
                                 width: 2,
                               ),
@@ -452,7 +529,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             ),
                             errorStyle: const TextStyle(
                               // Style for the error message
-                              color: Colors.red,
+                              color: Color(0xFFD50032),
                               // Change color to red for error message
                               fontSize: 12, // Adjust font size as needed
                             ),
@@ -461,6 +538,9 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             fontSize: 16,
                             fontWeight: FontWeight.w600,
                           ),
+                          onChanged: (input){
+                            _formKey.currentState!.validate();
+                          },
                           validator: (value) {
                             if (value == null || value.isEmpty) {
                               return 'Please enter your phone number';
@@ -482,7 +562,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             // const Color.fromARGB(
                             //     255, 40, 40, 40),
                             border: Border.all(
-                              color: Colors.grey,
+                              color: Color(0xFFD2D7DE),
                               width: 2,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
@@ -545,7 +625,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           padding: const EdgeInsets.only(left: 8.0),
                           decoration: BoxDecoration(
                             border: Border.all(
-                              color: Colors.grey,
+                              color: Color(0xFFD2D7DE),
                               width: 2,
                             ),
                             borderRadius: BorderRadius.circular(8.0),
@@ -637,9 +717,22 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           keyboardType: TextInputType.text,
                           decoration: InputDecoration(
                             hintText: 'Address',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                            labelText: 'Address',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                            ),
+                            floatingLabelBehavior:
+                            FloatingLabelBehavior.auto,
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD2D7DE),
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -654,7 +747,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             errorBorder: OutlineInputBorder(
                               // Optional: Keep same design for error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as enabled border
                                 width: 2,
                               ),
@@ -663,7 +756,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             focusedErrorBorder: OutlineInputBorder(
                               // Optional: Keep same design for focused error
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD50032),
                                 // Keep the same color as focused border
                                 width: 2,
                               ),
@@ -671,7 +764,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             ),
                             errorStyle: const TextStyle(
                               // Style for the error message
-                              color: Colors.red,
+                              color: Color(0xFFD50032),
                               // Change color to red for error message
                               fontSize: 12, // Adjust font size as needed
                             ),
@@ -701,9 +794,22 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                           keyboardType: TextInputType.number,
                           decoration: InputDecoration(
                             hintText: 'Secondary Number',
+                            hintStyle: TextStyle(
+                              color: Colors.grey[500],
+                              fontSize: 14,
+                              fontFamily: 'Poppins',
+                            ),
+                            labelText: 'Secondary Number',
+                            labelStyle: TextStyle(
+                              color: Colors.black,
+                              fontFamily: 'Poppins',
+                              fontSize: 16,
+                            ),
+                            floatingLabelBehavior:
+                            FloatingLabelBehavior.auto,
                             enabledBorder: OutlineInputBorder(
                               borderSide: const BorderSide(
-                                color: Colors.grey,
+                                color: Color(0xFFD2D7DE),
                                 width: 2,
                               ),
                               borderRadius: BorderRadius.circular(8),
@@ -754,9 +860,13 @@ class _SignUpWidgetState extends State<SignUpWidget> {
                             ),
                           ),
                           child: isLoading
-                              ? const CircularProgressIndicator(
-                                  valueColor: AlwaysStoppedAnimation<Color>(
-                                      Colors.white),
+                              ? SizedBox(
+                                  width: 20,
+                                  height: 20,
+                                  child: const CircularProgressIndicator(
+                                    valueColor: AlwaysStoppedAnimation<Color>(
+                                        Colors.white),
+                                  ),
                                 )
                               : const Text(
                                   'Signup',

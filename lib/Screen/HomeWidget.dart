@@ -32,6 +32,7 @@ class _HomeWidgetState extends State<HomeWidget> {
   List<BannerModel> bannerData = [];
   List<VendorModel> limitedVendorData = [];
   List<VendorModel> vendorData = [];
+  bool _isDownloading = true;
 
   @override
   void initState() {
@@ -44,11 +45,18 @@ class _HomeWidgetState extends State<HomeWidget> {
     super.dispose();
   }
 
-  _callAPI() {
-    _getBannerData();
-    _getLimitVendorData();
-    _getVendorData();
-    _checkToken();
+  _callAPI() async {
+    setState(() {
+      _isDownloading = true; // Set loading to true before API calls
+    });
+    await _getBannerData();
+    await _getLimitVendorData();
+    await _getVendorData();
+    await _checkToken();
+
+    setState(() {
+      _isDownloading = false; // Set loading to false after data is fetched
+    });
   }
 
   void _onDotTap(int index) {
@@ -58,7 +66,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     _controller.animateToPage(index);
   }
 
-  _getBannerData() async {
+  Future _getBannerData() async {
     try {
       final Response response = await dio.get(urls['banner']!);
       final body = response.data['data'];
@@ -73,16 +81,15 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
         );
       });
-
       setState(() {
-          bannerData = newBannerData;
-        });
+        bannerData = newBannerData;
+      });
     } catch (e) {
       print("Error Fetching banner: $e");
     }
   }
 
-  _getLimitVendorData() async {
+  Future _getLimitVendorData() async {
     try {
       final Response response = await dio.get(urls['limitVendor']!);
       final body = response.data['data'];
@@ -102,16 +109,15 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
         );
       });
-
       setState(() {
-          limitedVendorData = newVendorData;
-        });
+        limitedVendorData = newVendorData;
+      });
     } catch (e) {
       print("Error Fetching limited vendor data: $e");
     }
   }
 
-  _getVendorData() async {
+  Future _getVendorData() async {
     try {
       final Response response = await dio.get(urls['vendor']!);
 
@@ -132,10 +138,9 @@ class _HomeWidgetState extends State<HomeWidget> {
           ),
         );
       });
-
       setState(() {
-          vendorData = newVendorData;
-        });
+        vendorData = newVendorData;
+      });
     } catch (e) {
       print("Error Fetching  vendor data: $e");
     }
@@ -176,7 +181,18 @@ class _HomeWidgetState extends State<HomeWidget> {
           cardHeight = screen.height / crossAxisCount;
         }
 
-        return Scaffold(
+        if (_isDownloading) {
+          return Scaffold(
+            backgroundColor: Colors.white,
+            body: Center(
+              child:  CircularProgressIndicator(
+                color: const Color(0xFFDD143D),
+              ),
+            ),
+          );
+        } else {
+          return Scaffold(
+            backgroundColor: Colors.white,
           body: SafeArea(
             child: SingleChildScrollView(
               child: Column(
@@ -187,19 +203,19 @@ class _HomeWidgetState extends State<HomeWidget> {
                       enlargeCenterPage: false,
                       autoPlay: true,
                     )
-                  else if (isTablet)
-                    buildSlider(
-                      height: 300.0,
-                      enlargeCenterPage: true,
-                      autoPlay: true,
-                    )
-                  else
-                    buildSlider(
-                      height: 400.0,
-                      enlargeCenterPage: true,
-                      autoPlay: true,
-                    ),
-                  Padding(
+                    else if (isTablet)
+                      buildSlider(
+                        height: 300.0,
+                        enlargeCenterPage: true,
+                        autoPlay: true,
+                      )
+                    else
+                      buildSlider(
+                        height: 400.0,
+                        enlargeCenterPage: true,
+                        autoPlay: true,
+                      ),
+                    Padding(
                     padding: const EdgeInsets.only(
                       top: 16,
                       bottom: 16,
@@ -216,145 +232,250 @@ class _HomeWidgetState extends State<HomeWidget> {
                   ),
 
                   // Adjust width based on the number of cards
-                  kIsWeb
-                      ? Stack(
-                          children: [
-                            SizedBox(
-                              height: isMobile ? 180 : 250,
-                              child: GestureDetector(
-                                // this code for scrolling in web
-                                onHorizontalDragUpdate: (details) {
-                                  // Scroll the list based on swipe gesture
-                                  if (_scrollController.hasClients) {
-                                    _scrollController.jumpTo(
-                                      _scrollController.offset -
-                                          details.delta.dx,
-                                    );
-                                  }
-                                },
-                                child: ListView.builder(
-                                  controller: _scrollController,
-                                  scrollDirection: Axis.horizontal,
-                                  itemCount: limitedVendorData.length,
-                                  physics: const ClampingScrollPhysics(),
-                                  itemBuilder: (context, index) {
-                                    return SizedBox(
-                                      width: cardWidth,
-                                      child: VendorLimitedOfferWidget(
-                                        discount:
-                                            limitedVendorData[index].discount,
-                                        vendorName:
-                                            limitedVendorData[index].vendorName,
-                                        imageUrl:
-                                            limitedVendorData[index].imageUrl,
-                                      ),
-                                    );
-                                  },
+                  // kIsWeb
+                  //     ? Stack(
+                  //           children: [
+                  //             SizedBox(
+                  //               height: isMobile ? 180 : 250,
+                  //               child: GestureDetector(
+                  //                 // this code for scrolling in web
+                  //                 onHorizontalDragUpdate: (details) {
+                  //                   // Scroll the list based on swipe gesture
+                  //                   if (_scrollController.hasClients) {
+                  //                     _scrollController.jumpTo(
+                  //                       _scrollController.offset -
+                  //                           details.delta.dx,
+                  //                     );
+                  //                   }
+                  //                 },
+                  //                 child: ListView.builder(
+                  //                   controller: _scrollController,
+                  //                   scrollDirection: Axis.horizontal,
+                  //                   itemCount: limitedVendorData.length,
+                  //                   physics: const ClampingScrollPhysics(),
+                  //                   itemBuilder: (context, index) {
+                  //                     return SizedBox(
+                  //                       width: cardWidth,
+                  //                       child: VendorLimitedOfferWidget(
+                  //                         discount:
+                  //                             limitedVendorData[index].discount,
+                  //                         vendorName: limitedVendorData[index]
+                  //                             .vendorName,
+                  //                         imageUrl:
+                  //                             limitedVendorData[index].imageUrl,
+                  //                       ),
+                  //                     );
+                  //                   },
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //             Positioned(
+                  //               top: (isMobile ? 180 : 250) / 2 - 24,
+                  //               left: 8,
+                  //               child: Container(
+                  //                 padding: EdgeInsets.symmetric(
+                  //                     horizontal: 8, vertical: 4),
+                  //                 decoration: BoxDecoration(
+                  //                   color: Color(0xFFDD143D),
+                  //                   borderRadius: BorderRadius.circular(8),
+                  //                 ),
+                  //                 child: IconButton(
+                  //                   onPressed: () {
+                  //                     if (_scrollController.hasClients) {
+                  //                       _scrollController.jumpTo(
+                  //                         (_scrollController.offset + cardWidth)
+                  //                             .clamp(
+                  //                           0.0,
+                  //                           _scrollController
+                  //                               .position.maxScrollExtent,
+                  //                         ),
+                  //                       );
+                  //                     }
+                  //                   },
+                  //                   icon: Icon(
+                  //                     Icons.arrow_back_ios,
+                  //                     color: Colors.white,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //             Positioned(
+                  //               top: (isMobile ? 180 : 250) / 2 - 24,
+                  //               // Adjusting for vertical centering (24 is half the height of the button)
+                  //               right: 8,
+                  //               // Adjusting the left position for the forward button
+                  //               child: Container(
+                  //                 padding: EdgeInsets.symmetric(
+                  //                     horizontal: 8, vertical: 4),
+                  //                 decoration: BoxDecoration(
+                  //                   color: Color(0xFFDD143D),
+                  //                   borderRadius: BorderRadius.circular(8),
+                  //                 ),
+                  //                 child: IconButton(
+                  //                   onPressed: () {
+                  //                     if (_scrollController.hasClients) {
+                  //                       _scrollController.jumpTo(
+                  //                         (_scrollController.offset - cardWidth)
+                  //                             .clamp(
+                  //                           0.0,
+                  //                           _scrollController
+                  //                               .position.maxScrollExtent,
+                  //                         ),
+                  //                       );
+                  //                     }
+                  //                   },
+                  //                   icon: Icon(
+                  //                     Icons.arrow_forward_ios,
+                  //                     color: Colors.white,
+                  //                   ),
+                  //                 ),
+                  //               ),
+                  //             ),
+                  //           ],
+                  //         )
+                  //       : SizedBox(
+                  //           height: isMobile ? 180 : 250,
+                  //           child: GestureDetector(
+                  //             // this code for scrolling in web
+                  //             onHorizontalDragUpdate: (details) {
+                  //               // Scroll the list based on swipe gesture
+                  //               if (_scrollController.hasClients) {
+                  //                 _scrollController.jumpTo(
+                  //                   _scrollController.offset - details.delta.dx,
+                  //                 );
+                  //               }
+                  //             },
+                  //             child: ListView.builder(
+                  //               controller: _scrollController,
+                  //               scrollDirection: Axis.horizontal,
+                  //               itemCount: limitedVendorData.length,
+                  //               physics: const ClampingScrollPhysics(),
+                  //               itemBuilder: (context, index) {
+                  //                 return SizedBox(
+                  //                   width: cardWidth,
+                  //                   child: VendorLimitedOfferWidget(
+                  //                     discount:
+                  //                         limitedVendorData[index].discount,
+                  //                     vendorName:
+                  //                         limitedVendorData[index].vendorName,
+                  //                     imageUrl:
+                  //                         limitedVendorData[index].imageUrl,
+                  //                   ),
+                  //                 );
+                  //               },
+                  //             ),
+                  //           ),
+                  //         ),
+
+                  Stack(
+                    children: [
+                      SizedBox(
+                        height: isMobile ? 180 : 250,
+                        child: GestureDetector(
+                          // this code for scrolling in web
+                          onHorizontalDragUpdate: (details) {
+                            // Scroll the list based on swipe gesture
+                            if (_scrollController.hasClients) {
+                              _scrollController.jumpTo(
+                                _scrollController.offset -
+                                    details.delta.dx,
+                              );
+                            }
+                          },
+                          child: ListView.builder(
+                            controller: _scrollController,
+                            scrollDirection: Axis.horizontal,
+                            itemCount: limitedVendorData.length,
+                            physics: const ClampingScrollPhysics(),
+                            itemBuilder: (context, index) {
+                              return SizedBox(
+                                width: cardWidth,
+                                child: VendorLimitedOfferWidget(
+                                  discount:
+                                  limitedVendorData[index].discount,
+                                  vendorName: limitedVendorData[index]
+                                      .vendorName,
+                                  imageUrl:
+                                  limitedVendorData[index].imageUrl,
                                 ),
-                              ),
-                            ),
-                            Positioned(
-                              top: (isMobile ? 180 : 250) / 2 - 24,
-                              left: 8,
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFDD143D),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    if (_scrollController.hasClients) {
-                                      _scrollController.jumpTo(
-                                        (_scrollController.offset + cardWidth)
-                                            .clamp(
-                                          0.0,
-                                          _scrollController
-                                              .position.maxScrollExtent,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.arrow_back_ios,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              top: (isMobile ? 180 : 250) / 2 - 24,
-                              // Adjusting for vertical centering (24 is half the height of the button)
-                              right: 8,
-                              // Adjusting the left position for the forward button
-                              child: Container(
-                                padding: EdgeInsets.symmetric(
-                                    horizontal: 8, vertical: 4),
-                                decoration: BoxDecoration(
-                                  color: Color(0xFFDD143D),
-                                  borderRadius: BorderRadius.circular(8),
-                                ),
-                                child: IconButton(
-                                  onPressed: () {
-                                    if (_scrollController.hasClients) {
-                                      _scrollController.jumpTo(
-                                        (_scrollController.offset - cardWidth)
-                                            .clamp(
-                                          0.0,
-                                          _scrollController
-                                              .position.maxScrollExtent,
-                                        ),
-                                      );
-                                    }
-                                  },
-                                  icon: Icon(
-                                    Icons.arrow_forward_ios,
-                                    color: Colors.white,
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ],
-                        )
-                      : SizedBox(
-                          height: isMobile ? 180 : 250,
-                          child: GestureDetector(
-                            // this code for scrolling in web
-                            onHorizontalDragUpdate: (details) {
-                              // Scroll the list based on swipe gesture
+                              );
+                            },
+                          ),
+                        ),
+                      ),
+                      Positioned(
+                        top: (isMobile ? 180 : 250) / 2 - 24,
+                        left: 8,
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFDD143D),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
                               if (_scrollController.hasClients) {
                                 _scrollController.jumpTo(
-                                  _scrollController.offset - details.delta.dx,
+                                  (_scrollController.offset + cardWidth)
+                                      .clamp(
+                                    0.0,
+                                    _scrollController
+                                        .position.maxScrollExtent,
+                                  ),
                                 );
                               }
                             },
-                            child: ListView.builder(
-                              controller: _scrollController,
-                              scrollDirection: Axis.horizontal,
-                              itemCount: limitedVendorData.length,
-                              physics: const ClampingScrollPhysics(),
-                              itemBuilder: (context, index) {
-                                return SizedBox(
-                                  width: cardWidth,
-                                  child: VendorLimitedOfferWidget(
-                                    discount: limitedVendorData[index].discount,
-                                    vendorName:
-                                        limitedVendorData[index].vendorName,
-                                    imageUrl: limitedVendorData[index].imageUrl,
-                                  ),
-                                );
-                              },
+                            icon: Icon(
+                              Icons.arrow_back_ios,
+                              color: Colors.white,
                             ),
+                            padding: EdgeInsets.zero,
                           ),
                         ),
-
-                  Padding(
+                      ),
+                      Positioned(
+                        top: (isMobile ? 180 : 250) / 2 - 24,
+                        // Adjusting for vertical centering (24 is half the height of the button)
+                        right: 8,
+                        // Adjusting the left position for the forward button
+                        child: Container(
+                          height: 40,
+                          width: 40,
+                          decoration: BoxDecoration(
+                            color: Color(0xFFDD143D),
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: IconButton(
+                            onPressed: () {
+                              if (_scrollController.hasClients) {
+                                _scrollController.jumpTo(
+                                  (_scrollController.offset - cardWidth)
+                                      .clamp(
+                                    0.0,
+                                    _scrollController
+                                        .position.maxScrollExtent,
+                                  ),
+                                );
+                              }
+                            },
+                            icon: Icon(
+                              Icons.arrow_forward_ios,
+                              color: Colors.white,
+                            ),
+                            padding: EdgeInsets.zero,
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                    Padding(
                     padding: const EdgeInsets.only(top: 16.0),
                     child: SizedBox(
-                      height:
-                          isMobile ? screen.height / 2.7 : screen.height / 1.6,
-                      child: Column(
+                      height: isMobile
+                            ? screen.height / 2.7
+                            : screen.height / 1.6,
+                        child: Column(
                         mainAxisAlignment: MainAxisAlignment.start,
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
@@ -384,7 +505,8 @@ class _HomeWidgetState extends State<HomeWidget> {
                                 child: SingleChildScrollView(
                                   child: Wrap(
                                     // spacing: 8.0, // Space between items horizontally
-                                    runSpacing: 8.0, // Space between rows
+                                    runSpacing: 8.0,
+                                    // Space between rows
                                     children: vendorData.map((vendor) {
                                       return SizedBox(
                                         width: vendorCardWidth,
@@ -401,8 +523,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                                       );
                                     }).toList(),
                                   ),
-                                )),
-                          )
+                                ),
+                              ),
+                            )
                         ],
                       ),
                     ),
@@ -412,6 +535,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             ),
           ),
         );
+        }
       },
     );
   }
@@ -421,7 +545,7 @@ class _HomeWidgetState extends State<HomeWidget> {
     required bool enlargeCenterPage,
     required bool autoPlay,
   }) {
-    return Column(
+    return Stack(
       children: [
         CarouselSlider(
           items: bannerData
@@ -476,38 +600,48 @@ class _HomeWidgetState extends State<HomeWidget> {
             autoPlayCurve: Curves.fastOutSlowIn,
             autoPlayAnimationDuration: Duration(milliseconds: 800),
             viewportFraction: 1.0,
+            scrollDirection: Axis.vertical,
+            scrollPhysics: NeverScrollableScrollPhysics(),
             onPageChanged: (index, reason) {
               setState(() {
-                _current =
-                    index; // Update the current index when the page changes
+                _current = index;
               });
             },
           ),
           carouselController: _controller,
         ),
-        Row(
-          mainAxisAlignment: MainAxisAlignment.center,
-          children: bannerData.asMap().entries.map((entry) {
+        Positioned(
+          top: kIsWeb ?130 : 60,
+          right: 8,
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: bannerData.asMap().entries.map((entry) {
             return GestureDetector(
               onTap: () => _onDotTap(entry.key),
               // Tap to change slider position
               child: Padding(
                 padding: const EdgeInsets.only(top: 8.0),
                 child: Container(
-                  width: 12.0,
-                  height: 12.0,
-                  margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
+                    width: 16.0,
+                    height: 16.0,
+                    margin: EdgeInsets.symmetric(vertical: 8.0, horizontal: 4.0),
                   decoration: BoxDecoration(
                     shape: BoxShape.circle,
-                    color: _current == entry.key
-                        ? Colors.blueAccent // Active dot color
-                        : Colors.grey, // Inactive dot color
-                  ),
+                      border: Border.all(
+                        color: Colors.white,
+
+                        // _current == entry.key
+                        //     ? Colors.blue // Active border color
+                        //     : Colors.grey, // Inactive border color
+                        width: 2.0, // You can adjust the width of the border
+                      ),
+                    ),
                 ),
               ),
             );
           }).toList(),
-        ),
+          ),
+        )
       ],
     );
   }
