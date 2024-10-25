@@ -61,6 +61,7 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
     bool isTablet = screen.width >= 700 && screen.width < 900;
     bool isWeb = screen.width >= 900;
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
         child: FutureBuilder<ProfileModel?>(
           future: _fetchProfileData(), // Call the future method

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:nepvent_reward/Screen/ClaimsWidget.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
 import 'package:nepvent_reward/Screen/HomeWidget.dart';
@@ -118,6 +119,8 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                 children: [
                   isWeb
                       ? PopupMenuButton(
+                    position: PopupMenuPosition.under,
+                    color: Colors.white,
                     onSelected: (String value) {
                       if (value == 'Home') {
                         Navigator.push(
@@ -177,7 +180,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                                 value: 'Home',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.home),
+                                    Icon(MdiIcons.homeOutline),
                                 SizedBox(
                                   width: 4,
                                 ),
@@ -189,7 +192,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                                 value: 'Vendor',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.business_outlined),
+                                    Icon(MdiIcons.selectGroup),
                                     SizedBox(
                                       width: 4,
                               ),
@@ -201,7 +204,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                                 value: 'Subscription',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.subscriptions_outlined),
+                                    Icon(MdiIcons.accountReactivateOutline),
                                     SizedBox(
                                       width: 4,
                                     ),
@@ -225,7 +228,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                                 value: 'Profile',
                                 child: Row(
                                   children: [
-                                    Icon(Icons.person),
+                                    Icon(MdiIcons.accountOutline),
                                     SizedBox(
                                       width: 4,
                                     ),
@@ -235,13 +238,15 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                               ),
                             ];
                           },
-                          child: Icon(Icons.menu_sharp),
+                          child: Icon(MdiIcons.dotsGrid,size: 30,),
                         )
                       : const Material(),
                   isWeb
                       ? Padding(
                       padding: const EdgeInsets.all(8.0),
                           child: PopupMenuButton(
+                            position: PopupMenuPosition.under,
+                            color: Colors.white,
                             tooltip: "Profile",
                             onSelected: (String value) async {
                               if (value == 'Profile') {
@@ -271,7 +276,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                                     value: 'Profile',
                                     child: Row(
                                       children: [
-                                        Icon(Icons.person_2_sharp),
+                                        Icon(MdiIcons.accountOutline),
                                         SizedBox(
                                           width: 4,
                                         ),
@@ -282,7 +287,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                                   value: 'Logout',
                                   child: Row(
                                     children: [
-                                      Icon(Icons.logout_sharp),
+                                      Icon(MdiIcons.logout),
                                       SizedBox(
                                         width: 4,
                                       ),
@@ -315,32 +320,37 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
         body: _pages[_selectedIndex],
         bottomNavigationBar: isMobile || isTablet
             ? BottomNavigationBar(
-              backgroundColor: Colors.white,
-                items: const <BottomNavigationBarItem>[
+                items:[
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
+                    backgroundColor: Colors.white,
+                    icon: Icon(MdiIcons.homeOutline),
                     label: 'Home',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.business_outlined),
+                    backgroundColor: Colors.white,
+                    icon: Icon(MdiIcons.selectGroup),
                     label: 'Vendors',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.subscriptions_outlined),
+                    backgroundColor: Colors.white,
+                    icon: Icon(MdiIcons.accountReactivateOutline),
                     label: 'Subscription',
                   ),
                   BottomNavigationBarItem(
+                    backgroundColor: Colors.white,
                     icon: Icon(Icons.receipt_long_outlined),
                     label: 'Claims',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.person_3_outlined),
+                    backgroundColor: Colors.white,
+                    icon: Icon(MdiIcons.accountOutline),
                     label: 'Profile',
                   ),
                 ],
                 currentIndex: _selectedIndex,
                 selectedItemColor: Color(0xFFDD143D),
                 unselectedItemColor: Colors.grey[800],
+                backgroundColor: Colors.white,
                 onTap: _onItemTapped,
               )
             : const Material(),

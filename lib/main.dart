@@ -1,13 +1,16 @@
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
 import 'package:nepvent_reward/Check.dart';
 import 'package:nepvent_reward/Helper/AuthInterceptor.dart';
 import 'package:nepvent_reward/Provider/NepventProvider.dart';
+import 'package:nepvent_reward/Service/Notification.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+  !kIsWeb ? await AppNotification.init() : null;
   await dotenv.load(fileName: ".env");
 
   dio.options.baseUrl = dotenv.env['API_URL']!;

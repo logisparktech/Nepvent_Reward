@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nepvent_reward/Model/ProfileModel.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
+import 'package:nepvent_reward/Utils/Enum.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
 
@@ -22,11 +23,11 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   final ImagePicker _picker = ImagePicker();
   File? _imageFile;
   Uint8List webImage = Uint8List(8);
+  String? _selectedProvince;
+  String? _selectedDistrict;
 
   // Controllers for the form fields
   final TextEditingController addressController = TextEditingController();
-  final TextEditingController districtController = TextEditingController();
-  final TextEditingController provinceController = TextEditingController();
   final TextEditingController secondaryNumberController =
       TextEditingController();
 
@@ -39,6 +40,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   Future<ProfileModel?> _fetchProfileData() async {
     String userID = await secureStorage.read(key: 'userID') ?? '';
     String profilePic = '';
+    debugPrint(' ***** UserId 🆔 *** : $userID ');
     try {
       final Response response = await dio.get('${urls['profile']}/$userID');
       final body = response.data['data'];
@@ -72,8 +74,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
       // Set the address controller text
       addressController.text = profileData.address;
-      districtController.text = profileData.district;
-      provinceController.text = profileData.province;
+      _selectedDistrict = profileData.district;
+      _selectedProvince = profileData.province;
       secondaryNumberController.text = profileData.secondaryNumber;
 
       return profileData;
@@ -91,8 +93,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         data: {
           "userDetail": {
             "address": addressController.text.trim(),
-            "province": provinceController.text.trim(),
-            "district": districtController.text.trim(),
+            "province": _selectedProvince,
+            "district":_selectedDistrict,
             "secondaryNumber": secondaryNumberController.text.trim(),
           },
         },
@@ -196,8 +198,6 @@ class _ProfileWidgetState extends State<ProfileWidget> {
     // TODO: implement dispose
     super.dispose();
     addressController.dispose();
-    districtController.dispose();
-    provinceController.dispose();
     secondaryNumberController.dispose();
   }
 
@@ -453,6 +453,178 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                     color: Colors.black,
                                   ),
                                 ),
+
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 8.0,
+                                  ),
+                                  child: Text(
+                                    "Province",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ),
+                                isEditable
+                                    ? Container(
+                                  padding:
+                                  const EdgeInsets.only(left: 8.0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Color(0xFFD2D7DE),
+                                      width: 2,
+                                    ),
+                                    borderRadius:
+                                    BorderRadius.circular(8.0),
+                                  ),
+                                  child: DropdownButton(
+                                    value: _selectedProvince,
+                                    items: Province()
+                                        .map(
+                                          (province) => DropdownMenuItem(
+                                        value: province,
+                                        child: Text(
+                                          province,
+                                        ),
+                                      ),
+                                    )
+                                        .toList(),
+                                    onChanged: (dynamic value) {
+                                      if (value == null) {
+                                        return;
+                                      }
+                                      setState(() {
+                                        _selectedDistrict = null;
+                                        _selectedProvince = value;
+                                      });
+                                    },
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color: const Color(0xFFD50032),
+                                      fontSize: 16,
+                                    ),
+                                    hint: Text(
+                                      'Select the province',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    icon: const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Color(0xFFD50032),
+                                      size: 24,
+                                    ),
+                                    elevation: 2,
+                                    underline: Container(
+                                      height: 0,
+                                    ),
+                                    isExpanded: true,
+                                  ),
+                                )
+                                    : Text(
+                                  _selectedProvince?? 'N/A',
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
+                                  ),
+                                ),
+                                Padding(
+                                  padding: const EdgeInsets.only(
+                                    top: 8.0,
+                                  ),
+                                  child: Text(
+                                    "District",
+                                    style: TextStyle(
+                                      fontSize: 14,
+                                      color: Colors.grey[500],
+                                    ),
+                                  ),
+                                ),
+                                isEditable
+                                    ? Container(
+                                  padding: const EdgeInsets.only(left: 8.0),
+                                  decoration: BoxDecoration(
+                                    border: Border.all(
+                                      color: Color(0xFFD2D7DE),
+                                      width: 2,
+                                    ),
+                                    borderRadius: BorderRadius.circular(8.0),
+                                  ),
+                                  child: DropdownButton(
+                                    value: _selectedDistrict,
+                                    items: _selectedProvince != null
+                                        ? getDistrictsByProvince(_selectedProvince!)
+                                        .map((disct) {
+                                      return DropdownMenuItem(
+                                        value: disct,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Text(
+                                            disct
+                                                .toString()
+                                                .replaceAll('District.', ''),
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList()
+                                        : getDistrictsByProvince(
+                                        _selectedProvince ?? '')
+                                        .map((dis) {
+                                      return DropdownMenuItem(
+                                        value: dis,
+                                        child: FittedBox(
+                                          fit: BoxFit.contain,
+                                          child: Text(
+                                            dis,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                          ),
+                                        ),
+                                      );
+                                    }).toList(),
+                                    onChanged: (dynamic value) {
+                                      if (value == null) {
+                                        return;
+                                      }
+                                      setState(() {
+                                        _selectedDistrict = value;
+                                      });
+                                    },
+                                    style: TextStyle(
+                                      fontFamily: 'Poppins',
+                                      color: const Color(0xFFD50032),
+                                      fontSize: 16,
+                                    ),
+                                    hint: Text(
+                                      'Select the district',
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    icon: const Icon(
+                                      Icons.keyboard_arrow_down_rounded,
+                                      color: Color(0xFFD50032),
+                                      size: 24,
+                                    ),
+                                    elevation: 2,
+                                    underline: Container(
+                                      height: 0,
+                                    ),
+                                    isExpanded: true,
+                                  ),
+                                )
+                                    : Text(
+                                        _selectedDistrict?? 'N/A',
+                                        style: TextStyle(
+                                          fontSize: 18,
+                                          color: Colors.black,
+                                        ),
+                                      ),
                                 Padding(
                                   padding: const EdgeInsets.only(
                                     top: 8.0,
@@ -467,70 +639,31 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 ),
                                 isEditable
                                     ? TextFormField(
-                                        controller: addressController,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      )
-                                    : Text(
-                                        addressController.text,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
+                                  controller: addressController,
+                                  decoration: InputDecoration(
+                                    enabledBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFD2D7DE),
+                                        width: 2,
                                       ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "District",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    focusedBorder: OutlineInputBorder(
+                                      borderSide: const BorderSide(
+                                        color: Color(0xFFD50032),
+                                        width: 2,
+                                      ),
+                                      borderRadius: BorderRadius.circular(8),
                                     ),
                                   ),
-                                ),
-                                isEditable
-                                    ? TextFormField(
-                                        controller: districtController,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      )
+                                )
                                     : Text(
-                                        districtController.text,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "Province",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
+                                  addressController.text,
+                                  style: TextStyle(
+                                    fontSize: 18,
+                                    color: Colors.black,
                                   ),
                                 ),
-                                isEditable
-                                    ? TextFormField(
-                                        controller: provinceController,
-                                        decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
-                                        ),
-                                      )
-                                    : Text(
-                                        provinceController.text,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
-                                      ),
                                 Padding(
                                   padding: const EdgeInsets.only(
                                     top: 8.0,
@@ -547,7 +680,20 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                     ? TextFormField(
                                         controller: secondaryNumberController,
                                         decoration: InputDecoration(
-                                          border: OutlineInputBorder(),
+                                          enabledBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFFD2D7DE),
+                                              width: 2,
+                                            ),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
+                                          focusedBorder: OutlineInputBorder(
+                                            borderSide: const BorderSide(
+                                              color: Color(0xFFD50032),
+                                              width: 2,
+                                            ),
+                                            borderRadius: BorderRadius.circular(8),
+                                          ),
                                         ),
                                       )
                                     : Text(
@@ -564,7 +710,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                         padding:
                                             const EdgeInsets.only(top: 16.0),
                                         child: Row(
-
+                                          mainAxisAlignment: kIsWeb
+                                              ? MainAxisAlignment.start
+                                              : MainAxisAlignment.spaceBetween,
                                           children: [
                                             ElevatedButton(
                                               onPressed: () {

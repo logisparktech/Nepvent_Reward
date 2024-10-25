@@ -31,7 +31,7 @@ class AuthInterceptor extends Interceptor {
       }
 
       String token = await secureStorage.read(key: 'token') ?? '';
-
+        debugPrint(' ****** 😍Token😶‍🌫️ ***** : $token ');
       // Load your token here and pass to the header
       options.headers.addAll({'Authorization': 'Bearer $token'});
 

@@ -1,16 +1,25 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:nepvent_reward/Screen/VendorDetailWidget.dart';
 
 class VendorLimitedOfferWidget extends StatelessWidget {
   final int discount;
   final String vendorName;
   final String imageUrl;
+  final String address;
+  final String description;
+  final String phone;
+  final bool isLogin;
 
   const VendorLimitedOfferWidget({
     super.key,
     required this.discount,
     required this.vendorName,
     required this.imageUrl,
+    required this.address,
+    required this.description,
+    required this.phone,
+    required this.isLogin,
   });
 
   @override
@@ -18,7 +27,22 @@ class VendorLimitedOfferWidget extends StatelessWidget {
     return Padding(
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: InkWell(
-        onTap: () {},
+        onTap: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => VendorDetailWidget(
+                discount: discount,
+                vendorName: vendorName,
+                imageUrl: imageUrl,
+                address: address,
+                description: description,
+                phone: phone,
+                isLogin: isLogin,
+              ),
+            ),
+          );
+        },
         child: Stack(
           children: [
             // Background Image

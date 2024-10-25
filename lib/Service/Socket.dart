@@ -1,3 +1,5 @@
+import 'package:flutter/foundation.dart';
+import 'package:nepvent_reward/Service/NotificationData.dart';
 import 'package:socket_io_client/socket_io_client.dart' as IO;
 
 class SocketService {
@@ -24,21 +26,31 @@ class SocketService {
     socket.onConnect((_) {
       print("Connection established");
     });
-
     socket.onConnectError(
       (err) => print("Connection Error: $err"),
     );
-    socket.onDisconnect((_) => print("connection Disconnection"));
+    socket.onDisconnect((error) => print(" **** * * * * Connection Disconnection ***** $error "));
     socket.onError((err) => print(err));
 
     socket.onConnect((_) {
       print('socket connected: ${socket.id}');
-      socket.on('notification', (data) => print('Received notification: $data'));
+      socket.on(
+          'notification',
+              (data) {
+
+                final String title = data['title'];
+                final String content = data['content'];
+                final String imageUrl = data['picture'][0]['url'];
+                final String date = data['date'];
+            print('Data :  $data');
+            if (kIsWeb) {
+              print('Received notification: $data');
+            } else {
+              NotificationData().show(title, content,date,imageUrl);
+            }
+          }
+      );
+
     });
-    // socket.on('notification', (data) => print(data));
-    socket.on(
-      'notification',
-      (data) => print('Received notification: $data'),
-    );
   }
 }

@@ -1,10 +1,14 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:nepvent_reward/Check.dart';
+import 'package:nepvent_reward/Screen/Design/CustomPasswordTextFormField.dart';
+import 'package:nepvent_reward/Screen/Design/CustomTextFormField.dart';
 import 'package:nepvent_reward/Screen/Web/SignUpForWeb.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class LoginForWebWidget extends StatefulWidget {
   const LoginForWebWidget({super.key});
@@ -21,12 +25,12 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
   final passwordController = TextEditingController();
   final _formKey = GlobalKey<FormState>();
   var _isObscured;
-  final _unfocusNode = FocusNode();
 
   @override
   void initState() {
     super.initState();
     _isObscured = true;
+    _loadSavedData();
   }
 
   _login() async {
@@ -60,6 +64,7 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
             value: response.data['data']['displayPicture']['url'].toString(),
           );
         }
+        await _saveData();
         Navigator.push(
           context,
           MaterialPageRoute(
@@ -88,10 +93,35 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
       debugPrint("Error ON Login : $error");
     }
   }
+  Future<void> _loadSavedData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? savedNumber = prefs.getString('number');
+    String? savedPassword = prefs.getString('password');
+    bool? rememberMe = prefs.getBool('rememberMe');
+
+    if (savedNumber != null && savedPassword != null && rememberMe == true) {
+      setState(() {
+        numberController.text = savedNumber;
+        passwordController.text = savedPassword;
+        remamberMe = rememberMe!;
+      });
+    }
+  }
+  Future<void> _saveData() async {
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    if (remamberMe) {
+      await prefs.setString('number', numberController.text);
+      await prefs.setString('password', passwordController.text);
+      await prefs.setBool('rememberMe', remamberMe);
+    } else {
+      await prefs.remove('number');
+      await prefs.remove('password');
+      await prefs.remove('rememberMe');
+    }
+  }
 
   @override
   void dispose() {
-    _unfocusNode.dispose();
     super.dispose();
     numberController.dispose();
     passwordController.dispose();
@@ -107,8 +137,8 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
       elevation: 16,
       backgroundColor: Colors.transparent,
       child: Container(
-        width: screen.width / 2,
-        height: screen.height / 2,
+        width: 800,
+        height: 450,
         // padding: const EdgeInsets.all(16),
         decoration: BoxDecoration(
           color: Colors.white,
@@ -129,41 +159,37 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
               ), // Set your desired radius
               child: Image.asset(
                 'assets/images/top-view.jpg', // Promo Image for offer
-                fit: BoxFit.fill,
-                width: screen.height / 2,
-                height: screen.height / 2,
+                fit: BoxFit.cover,
+                width: 400,
+                height: 450,
               ),
             ),
             Expanded(
               child: Padding(
                 padding:
-                    const EdgeInsets.only(left: 16.0, right: 16.0, top: 16.0),
+                    const EdgeInsets.only(left: 16.0, right: 8.0, top: 8.0),
                 child: Column(
-                  // mainAxisSize: MainAxisSize.min,
                   children: [
                     Row(
                       mainAxisAlignment: MainAxisAlignment.end,
                       children: [
-                        CircleAvatar(
-                          radius: 20,
-                          backgroundColor: Color(0xFFD50032),
-                          child: IconButton(
-                            onPressed: () {
-                              Navigator.pop(context);
-                            },
-                            icon: Icon(
-                              Icons.close,
-                              color: Colors.white,
-                            ),
+                        IconButton(
+                          onPressed: () {
+                            Navigator.pop(context);
+                          },
+                          icon: Icon(
+                            MdiIcons.closeCircleOutline,
+                            color: Color(0xFFD50032),
+                            size: 40,
                           ),
-                        )
+                        ),
                       ],
                     ),
                     Row(
                       mainAxisAlignment: MainAxisAlignment.center,
-                      children: const [
+                      children:  [
                         Icon(
-                          Icons.person,
+                          MdiIcons.account,
                           color: Colors.black,
                           size: 24,
                         ),
@@ -181,177 +207,28 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                     Form(
                       key: _formKey,
                       child: Padding(
-                        padding: const EdgeInsets.only(top: 30.0),
+                        padding: const EdgeInsets.only(top: 20.0),
                         child: Column(
                           children: [
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  10, 10, 10, 10),
-                              child: TextFormField(
-                                controller: numberController,
-                                autofocus: false,
-                                obscureText: false,
+                                  10, 5, 10, 5),
+                              child: CustomTextFormField(
+                                labelText: 'Phone Number',
+                                hintText: 'Phone Number',
                                 keyboardType: TextInputType.number,
-                                decoration: InputDecoration(
-                                  hintText: 'Phone Number',
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey[500],
-                                    fontSize: 14,
-                                    fontFamily: 'Poppins',
-                                  ),
-                                  labelText: 'Phone Number',
-                                  labelStyle: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Poppins',
-                                    fontSize: 16,
-                                  ),
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.auto,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.grey,
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0xFFD50032),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    // Optional: Keep same design for error
-                                    borderSide: const BorderSide(
-                                      color: Colors.grey,
-                                      // Keep the same color as enabled border
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    // Optional: Keep same design for focused error
-                                    borderSide: const BorderSide(
-                                      color: Colors.grey,
-                                      // Keep the same color as focused border
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  errorStyle: const TextStyle(
-                                    // Style for the error message
-                                    color: Color(0xFFD50032),
-                                    // Change color to red for error message
-                                    fontSize: 12, // Adjust font size as needed
-                                  ),
-                                ),
-                                style: const TextStyle(
-                                  fontSize: 16,
-                                  fontFamily: 'Poppins',
-                                ),
-                                onChanged: (input) {
-                                  _formKey.currentState!.validate();
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your phone number';
-                                  }
-                                  if (!RegExp(r'^9\d{9}$').hasMatch(value)) {
-                                    return 'Please enter a valid 10-digit number starting with 9';
-                                  }
-                                  return null;
-                                },
+                                controller: numberController,
+                                type: 'phone_number',
                               ),
                             ),
                             Padding(
                               padding: const EdgeInsetsDirectional.fromSTEB(
-                                  10, 10, 10, 10),
-                              child: TextFormField(
+                                  10, 5, 10, 5),
+                              child: CustomPasswordTextFormField(
                                 controller: passwordController,
-                                autofocus: false,
-                                obscureText: _isObscured,
-                                decoration: InputDecoration(
-                                  hintText: 'Password',
-                                  hintStyle: TextStyle(
-                                    color: Colors.grey[500],
-                                    fontSize: 14,
-                                    fontFamily: 'Poppins',
-                                  ),
-                                  labelText: 'Password',
-                                  labelStyle: TextStyle(
-                                    color: Colors.black,
-                                    fontFamily: 'Poppins',
-                                    fontSize: 16,
-                                  ),
-                                  floatingLabelBehavior:
-                                      FloatingLabelBehavior.auto,
-                                  enabledBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Colors.grey,
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  focusedBorder: OutlineInputBorder(
-                                    borderSide: const BorderSide(
-                                      color: Color(0xFFD50032),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  errorBorder: OutlineInputBorder(
-                                    // Optional: Keep same design for error
-                                    borderSide: const BorderSide(
-                                      color: Colors.grey,
-                                      // Keep the same color as enabled border
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  focusedErrorBorder: OutlineInputBorder(
-                                    // Optional: Keep same design for focused error
-                                    borderSide: const BorderSide(
-                                      color: Colors.grey,
-                                      // Keep the same color as focused border
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  errorStyle: const TextStyle(
-                                    // Style for the error message
-                                    color: Color(0xFFD50032),
-                                    // Change color to red for error message
-                                    fontSize: 12, // Adjust font size as needed
-                                  ),
-                                  suffixIcon: InkWell(
-                                    onTap: () => setState(
-                                        () => _isObscured = !_isObscured),
-                                    child: Icon(
-                                      _isObscured
-                                          ? Icons.visibility_outlined
-                                          : Icons.visibility_off_outlined,
-                                      color: Color(0xFFD50032),
-                                      size: 22,
-                                    ),
-                                  ),
-                                ),
-                                style: const TextStyle(
-                                  color: Colors.grey,
-                                  fontSize: 16,
-                                ),
-                                onChanged: (input) {
-                                  _formKey.currentState!.validate();
-                                },
-                                validator: (value) {
-                                  if (value == null || value.isEmpty) {
-                                    return 'Please enter your password';
-                                  }
-                                  if (value.length < 6) {
-                                    return 'Password must be at least 6 characters long';
-                                  }
-                                  return null;
-                                },
+                                hintText: 'Password',
+                                labelText: 'Password',
+                                isPassword: true,
                               ),
                             ),
                           ],
@@ -389,9 +266,9 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
 
                     Padding(
                       padding:
-                          const EdgeInsets.only(top: 16.0, left: 10, right: 10),
+                          const EdgeInsets.only(top: 14.0, left: 10, right: 10),
                       child: SizedBox(
-                        height: 45,
+                        height: 50,
                         child: ElevatedButton(
                           onPressed: () async {
                             if (_formKey.currentState!.validate()) {
@@ -408,7 +285,7 @@ class _LoginForWebWidgetState extends State<LoginForWebWidget> {
                             backgroundColor: const Color(0xFFD50032),
                             padding: const EdgeInsetsDirectional.fromSTEB(
                                 24, 0, 24, 0),
-                            minimumSize: Size(screen.width, 40),
+                            minimumSize: Size(screen.width, 60),
                             elevation: 2,
                             side: const BorderSide(
                               color: Color(0xFFD50032),

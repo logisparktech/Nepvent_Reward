@@ -1,7 +1,9 @@
 import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
-import 'package:nepvent_reward/HelperScreen/VendorCardWidget.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:nepvent_reward/Model/VendorModel.dart';
+import 'package:nepvent_reward/Screen/Design/HelperScreen/VendorCardWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
 
@@ -85,6 +87,183 @@ class _VendorWidgetState extends State<VendorWidget> {
     _isLogin = token.isNotEmpty; // Set to true if token is not empty, false otherwise
   }
 
+  void _openFilterModal() {
+    showModalBottomSheet(
+      context: context,
+      isScrollControlled: true,
+      shape: RoundedRectangleBorder(
+        borderRadius: BorderRadius.vertical(top: Radius.circular(25.0)),
+      ),
+      builder: (BuildContext context) {
+        return Padding(
+          padding: EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+          child: ListView(
+            padding: EdgeInsets.only(left: 15),
+            shrinkWrap: true,
+            children: [
+              Center(
+                child: IconButton(
+                  onPressed: () {
+                    Navigator.pop(context);
+                  },
+                  icon: Icon(
+                    MdiIcons.chevronDown,
+                    color: Color(0xFFDD153C),
+                    size: 40,
+                  ),
+                ),
+              ),
+              Text(
+                "Filter By",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Color(0xFFDD153C),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Column(
+                children: [
+                  ListTile(
+                    title: const Text('Discount'),
+                    leading: Radio(
+                      value: 'discount',
+                      groupValue: _selectedFilter,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedFilter = value;
+                          Navigator.pop(context);
+                          _getVendorData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Name'),
+                    leading: Radio(
+                      value: 'name',
+                      groupValue: _selectedFilter,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedFilter = value;
+                          Navigator.pop(context);
+                          _getVendorData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Created At'),
+                    leading: Radio(
+                      value: 'createdAt',
+                      groupValue: _selectedFilter,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedFilter = value;
+                          Navigator.pop(context);
+                          _getVendorData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Updated At'),
+                    leading: Radio(
+                      value: 'updatedAt',
+                      groupValue: _selectedFilter,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedFilter = value;
+                          Navigator.pop(context);
+                          _getVendorData();
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Text(
+                "Sort Order",
+                style: TextStyle(
+                  fontSize: 20,
+                  color: Color(0xFFDD153C),
+                  fontWeight: FontWeight.w700,
+                ),
+              ),
+              Column(
+                children: [
+                  ListTile(
+                    title: const Text('Ascending'),
+                    leading: Radio(
+                      value: 'ASC',
+                      groupValue: _selectedOrder,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedOrder = value;
+                          Navigator.pop(context);
+                          _getVendorData();
+                        });
+                      },
+                    ),
+                  ),
+                  ListTile(
+                    title: const Text('Descending'),
+                    leading: Radio(
+                      value: 'DESC',
+                      groupValue: _selectedOrder,
+                      onChanged: (String? value) {
+                        setState(() {
+                          _selectedOrder = value;
+                          Navigator.pop(context);
+                          _getVendorData();
+                        });
+                      },
+                    ),
+                  ),
+                ],
+              ),
+              Padding(
+                padding: const EdgeInsets.only(left: 8.0),
+                child: Container(
+                  alignment: Alignment.center,
+                  width: 150,
+                  height: 100,
+                  child: ElevatedButton(
+                    onPressed: () {
+                      debugPrint("Clear All Button Clicked ");
+                      setState(() {
+                        _selectedFilter = null;
+                        _selectedOrder = null;
+                      });
+                      _getVendorData();
+                      Navigator.pop(context);
+                    },
+                    style: ElevatedButton.styleFrom(
+                      backgroundColor: Color(0xFFDD153C),
+                      foregroundColor: Colors.white,
+                      padding:
+                          EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      shape: RoundedRectangleBorder(
+                        borderRadius: BorderRadius.circular(10),
+                      ),
+                    ),
+                    child: Text(
+                      "Clear All",
+                      style: TextStyle(
+                        fontWeight: FontWeight.w700,
+                      ),
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        );
+      },
+    ).whenComplete(() {
+      setState(() {});
+    });
+  }
+
   // _searchFilterData() {
   //   if (searchController.text.isNotEmpty) {
   //     List<VendorModel> filteredList = vendorData
@@ -139,30 +318,37 @@ class _VendorWidgetState extends State<VendorWidget> {
 
       return Scaffold(
         key: _scaffoldKey,
-        endDrawer: Drawer(
+        drawer: Drawer(
           child: ListView(
             padding: EdgeInsets.only(left: 15),
             children: [
-              DrawerHeader(
-                child: Center(
-                  child: IconButton(
-                    onPressed: () {
-                      _scaffoldKey.currentState!.closeEndDrawer();
-                    },
-                    icon: Icon(
-                      Icons.close_outlined,
-                      color: Color(0xFFDD153C),
-                      size: 50,
+              Padding(
+                padding: const EdgeInsets.all(8.0),
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                  children: [
+                    Padding(
+                      padding: const EdgeInsets.only(top: 8.0),
+                      child: Text(
+                        "Filter By",
+                        style: TextStyle(
+                          fontSize: 20,
+                          color: Color(0xFFDD153C),
+                          fontWeight: FontWeight.w700,
+                        ),
+                      ),
                     ),
-                  ),
-                ),
-              ),
-              Text(
-                "Filter By",
-                style: TextStyle(
-                  fontSize: 20,
-                  color: Color(0xFFDD153C),
-                  fontWeight: FontWeight.w700,
+                    IconButton(
+                      onPressed: () {
+                        _scaffoldKey.currentState!.closeDrawer();
+                      },
+                      icon: Icon(
+                        MdiIcons.closeCircleOutline,
+                        color: Color(0xFFDD153C),
+                        size: 40,
+                      ),
+                    ),
+                  ],
                 ),
               ),
               Column(
@@ -286,7 +472,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                       _selectedFilter = null;
                       _selectedOrder = null;
                       _getVendorData();
-                      _scaffoldKey.currentState!.closeEndDrawer();
+                      _scaffoldKey.currentState!.closeDrawer();
                     },
                     style: ElevatedButton.styleFrom(
                       backgroundColor: Color(0xFFDD153C),
@@ -313,190 +499,197 @@ class _VendorWidgetState extends State<VendorWidget> {
           ),
         ),
 
-        // FilterDrawerWidget(
-        //   scaffoldKey: _scaffoldKey,
-        // ),
         backgroundColor: Colors.white,
         body: SafeArea(
-          child: Column(
-            mainAxisAlignment: MainAxisAlignment.start,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              Padding(
-                padding: const EdgeInsets.only(
-                    top: 16.0, bottom: 8.0, right: 8.0, left: 8.0),
-                child:TextFormField(
-                  controller: searchController,
-                  autofocus: false,
-                  obscureText: false,
-                  // onChanged: (searchData) {
-                  //   // _searchFilterData();
-                  // },
-                  decoration: InputDecoration(
-                    labelStyle: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 16,
-                    ),
-                    hintText: 'Search Vendor',
-                    hintStyle: TextStyle(
-                      fontFamily: 'Poppins',
-                      fontSize: 14,
-                      fontWeight: FontWeight.w600,
-                    ),
-                    enabledBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Color(0xFFD2D7DE),
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    focusedBorder: OutlineInputBorder(
-                      borderSide: const BorderSide(
-                        color: Color(0xFFDD143D),
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    errorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: const Color(0xFFDD143D),
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    focusedErrorBorder: OutlineInputBorder(
-                      borderSide: BorderSide(
-                        color: const Color(0xFFDD143D),
-                        width: 2,
-                      ),
-                      borderRadius: BorderRadius.circular(8),
-                    ),
-                    filled: true,
-                    fillColor: Colors.white, // Set background color to white
-                    prefixIcon: Icon(
-                      Icons.search,
-                      color: Colors.grey,
-                    ),
-                  ),
-                  style: TextStyle(
-                    fontFamily: 'Poppins',
-                    fontSize: 14,
-                    fontWeight: FontWeight.w600,
-                  ),
-                ),
-
+          child: Center(
+            child: Container(
+              constraints: BoxConstraints(
+                maxWidth: 1600, // Equivalent to max-width: 1600px
               ),
-              Padding(
-                padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                child: Container(
-                  alignment: Alignment.topLeft,
-                  width: 100, // Set the button width
-                  child: ElevatedButton(
-                    onPressed: () {
-                      // Open the drawer when the button is pressed
-                      debugPrint("Filter Button Clicked ");
-                      if (_scaffoldKey.currentState!.isEndDrawerOpen) {
-                        Navigator.of(context)
-                            .pop(); // Close the end drawer if open
-                      } else {
-                        _scaffoldKey.currentState!
-                            .openEndDrawer(); // Open the end drawer
-                      }
-                    },
-                    style: ElevatedButton.styleFrom(
-                      // backgroundColor: Colors.blue,
-                      foregroundColor: Colors.black,
-                      padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 10),
-                      shape: RoundedRectangleBorder(
-                        borderRadius: BorderRadius.circular(8),
-                        side: BorderSide(
-                          color: Colors.black,
+              width:
+                  MediaQuery.sizeOf(context).width, // Equivalent to width: 100%
+              child: Column(
+                mainAxisAlignment: MainAxisAlignment.start,
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: [
+                  Padding(
+                    padding: const EdgeInsets.only(
+                        top: 16.0, bottom: 8.0, right: 8.0, left: 8.0),
+                    child: TextFormField(
+                      controller: searchController,
+                      autofocus: false,
+                      obscureText: false,
+                      decoration: InputDecoration(
+                        labelStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 16,
+                        ),
+                        hintText: 'Search Vendor',
+                        hintStyle: TextStyle(
+                          fontFamily: 'Poppins',
+                          fontSize: 14,
+                          fontWeight: FontWeight.w600,
+                        ),
+                        enabledBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: Color(0xFFD2D7DE),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedBorder: OutlineInputBorder(
+                          borderSide: const BorderSide(
+                            color: Color(0xFFDD143D),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        errorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: const Color(0xFFDD143D),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        focusedErrorBorder: OutlineInputBorder(
+                          borderSide: BorderSide(
+                            color: const Color(0xFFDD143D),
+                            width: 2,
+                          ),
+                          borderRadius: BorderRadius.circular(8),
+                        ),
+                        filled: true,
+                        fillColor: Colors.white,
+                        // Set background color to white
+                        prefixIcon: Icon(
+                          MdiIcons.magnify,
+                          color: Colors.grey,
+                        ),
+                      ),
+                      style: TextStyle(
+                        fontFamily: 'Poppins',
+                        fontSize: 14,
+                        fontWeight: FontWeight.w600,
+                      ),
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                    child: Container(
+                      alignment: Alignment.topLeft,
+                      width: 100, // Set the button width
+                      child: ElevatedButton(
+                        onPressed: () {
+                          debugPrint("Filter Button Clicked ");
+                          kIsWeb
+                              ? (_scaffoldKey.currentState!.isDrawerOpen
+                                      ? Navigator.of(context)
+                                          .pop() // Close the drawer
+                                      : _scaffoldKey.currentState!
+                                          .openDrawer() // Open the drawer
+                                  )
+                              : _openFilterModal();
+                        },
+                        style: ElevatedButton.styleFrom(
+                          // backgroundColor: Colors.blue,
+                          foregroundColor: Colors.black,
+                          padding: EdgeInsets.symmetric(
+                              horizontal: 16, vertical: 10),
+                          shape: RoundedRectangleBorder(
+                            borderRadius: BorderRadius.circular(8),
+                            side: BorderSide(
+                              color: Colors.black,
+                            ),
+                          ),
+                        ),
+                        child: Row(
+                          children: [
+                            Icon(MdiIcons.tuneVariant), // Icon on the left
+                            SizedBox(width: 8), // Space between icon and text
+                            Text("Filter"),
+                          ],
                         ),
                       ),
                     ),
-                    child: Row(
-                      children: [
-                        Icon(Icons.filter_alt_outlined), // Icon on the left
-                        SizedBox(width: 8), // Space between icon and text
-                        Text("Filter"),
-                      ],
+                  ),
+                  Expanded(
+                    child: FutureBuilder<List<VendorModel>>(
+                      future: _getVendorData(),
+                      builder: (context, snapshot) {
+                        if (snapshot.connectionState ==
+                            ConnectionState.waiting) {
+                          return Center(
+                            child: CircularProgressIndicator(
+                              color: const Color(0xFFDD143D),
+                            ),
+                          );
+                        } else if (snapshot.hasError) {
+                          return Center(
+                              child: Text('Error: ${snapshot.error}'));
+                        } else if (!snapshot.hasData ||
+                            snapshot.data!.isEmpty) {
+                          return Center(child: Text('No vendors found.'));
+                        } else {
+                          // Filter the data based on the search input
+                          List<VendorModel> filteredItems = snapshot.data!
+                              .where((vendor) => vendor.vendorName
+                                  .toLowerCase()
+                                  .contains(
+                                      searchController.text.toLowerCase()))
+                              .toList();
+
+                          return Padding(
+                            padding: kIsWeb
+                                ? const EdgeInsets.only(bottom: 16)
+                                : const EdgeInsets.only(bottom: 1),
+                            child: SizedBox(
+                              width: screen.width,
+                              child: kIsWeb
+                                  ? Wrap(
+                                      runSpacing: 8.0,
+                                      children: filteredItems.map((vendor) {
+                                        return SizedBox(
+                                          width: vendorCardWidth,
+                                          child: VendorCardWidget(
+                                            discount: vendor.discount,
+                                            vendorName: vendor.vendorName,
+                                            imageUrl: vendor.imageUrl,
+                                            address: vendor.location,
+                                            description: vendor.description,
+                                            phone: vendor.phone,
+                                            isLogin: _isLogin,
+                                          ),
+                                        );
+                                      }).toList(),
+                                    )
+                                  : SingleChildScrollView(
+                                      child: Wrap(
+                                        runSpacing: 8.0,
+                                        children: filteredItems.map((vendor) {
+                                          return SizedBox(
+                                            width: vendorCardWidth,
+                                            child: VendorCardWidget(
+                                              discount: vendor.discount,
+                                              vendorName: vendor.vendorName,
+                                              imageUrl: vendor.imageUrl,
+                                              address: vendor.location,
+                                              description: vendor.description,
+                                              phone: vendor.phone,
+                                              isLogin: _isLogin,
+                                            ),
+                                          );
+                                        }).toList(),
+                                      ),
+                                    ),
+                            ),
+                          );
+                        }
+                      },
                     ),
                   ),
-                ),
+                ],
               ),
-
-              Expanded(
-                child: FutureBuilder<List<VendorModel>>(
-                  future: _getVendorData(),
-                  builder: (context, snapshot) {
-                    if (snapshot.connectionState == ConnectionState.waiting) {
-                      return Center(
-                        child: CircularProgressIndicator(
-                          color: const Color(0xFFDD143D),
-                        ),
-                      );
-                    } else if (snapshot.hasError) {
-                      return Center(child: Text('Error: ${snapshot.error}'));
-                    } else if (!snapshot.hasData || snapshot.data!.isEmpty) {
-                      return Center(child: Text('No vendors found.'));
-                    } else {
-                      // Filter the data based on the search input
-                      List<VendorModel> filteredItems = snapshot.data!
-                          .where((vendor) => vendor.vendorName
-                              .toLowerCase()
-                              .contains(searchController.text.toLowerCase()))
-                          .toList();
-
-                      return SingleChildScrollView(
-                        child: Wrap(
-                          runSpacing: 8.0,
-                          children: filteredItems.map((vendor) {
-                            return SizedBox(
-                              width: vendorCardWidth,
-                              child: VendorCardWidget(
-                                discount: vendor.discount,
-                                vendorName: vendor.vendorName,
-                                imageUrl: vendor.imageUrl,
-                                address: vendor.location,
-                                description: vendor.description,
-                                phone: vendor.phone,
-                                isLogin: _isLogin,
-                              ),
-                            );
-                          }).toList(),
-                        ),
-                      );
-                    }
-                  },
-                ),
-              ),
-              // Padding(
-              //   padding: const EdgeInsets.only(top: 16.0),
-              //   child: SizedBox(
-              //       height:
-              //       isMobile ? screen.height * 0.645 : screen.height * 0.76,
-              //       child: SingleChildScrollView(
-              //         child: Wrap(
-              //           // spacing: 8.0, // Space between items horizontally
-              //           runSpacing: 8.0, // Space between rows
-              //           children: filteredItems.map((vendor) {
-              //             return SizedBox(
-              //               width: vendorCardWidth,
-              //               // height: cardHeight,
-              //               child: VendorCardWidget(
-              //                 discount: vendor.discount,
-              //                 vendorName: vendor.vendorName,
-              //                 imageUrl: vendor.imageUrl,
-              //                 address: vendor.location,
-              //               ),
-              //             );
-              //           }).toList(),
-              //         ),
-              //     ),
-              //   ),
-              // )
-            ],
+            ),
           ),
         ),
       );

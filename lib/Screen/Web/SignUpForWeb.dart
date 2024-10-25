@@ -1,6 +1,8 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
+import 'package:nepvent_reward/Screen/Design/CustomPasswordTextFormField.dart';
+import 'package:nepvent_reward/Screen/Design/CustomTextFormField.dart';
 import 'package:nepvent_reward/Screen/LoginDashboardWidget.dart';
 import 'package:nepvent_reward/Utils/Enum.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
@@ -166,427 +168,64 @@ class _SignUpForWebState extends State<SignUpForWeb> {
                       children: [
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
-                          child: TextFormField(
+                              10, 5, 10, 5),
+                          child: CustomTextFormField(
+                            labelText: 'Full Name',
+                            hintText: 'Full Name',
                             controller: nameController,
-                            autofocus: true,
-                            obscureText: false,
                             keyboardType: TextInputType.name,
-                            decoration: InputDecoration(
-                              hintText: 'Full Name',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                              ),
-                              labelText: 'Full Name',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD2D7DE),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as enabled border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for focused error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as focused border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorStyle: const TextStyle(
-                                // Style for the error message
-                                color: Color(0xFFD50032),
-                                // Change color to red for error message
-                                fontSize: 12, // Adjust font size as needed
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            onChanged: (input) {
-                              _formKey.currentState!.validate();
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your name';
-                              }
-                              // Uncomment if you want to validate against letters and spaces only
-                              // if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-                              //   return 'Please enter a valid name (letters and spaces only)';
-                              // }
-                              return null;
-                            },
+                            type: 'name',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
-                          child: TextFormField(
+                              10, 5, 10, 5),
+                          child: CustomTextFormField(
+                            labelText: 'Email',
+                            hintText: 'Email',
                             controller: emailController,
-                            autofocus: false,
-                            obscureText: false,
                             keyboardType: TextInputType.emailAddress,
-                            decoration: InputDecoration(
-                              hintText: 'Email',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                              ),
-                              labelText: 'Email',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD2D7DE),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as enabled border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for focused error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as focused border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorStyle: const TextStyle(
-                                // Style for the error message
-                                color: Color(0xFFD50032),
-                                // Change color to red for error message
-                                fontSize: 12, // Adjust font size as needed
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            onChanged: (input) {
-                              _formKey.currentState!.validate();
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your email';
-                              }
-                              // Basic email pattern validation
-                              if (!RegExp(r'^[^@]+@[^@]+\.[^@]+')
-                                  .hasMatch(value)) {
-                                return 'Please enter a valid email';
-                              }
-                              return null;
-                            },
+                            type: 'email',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
-                          child: TextFormField(
+                              10, 5, 10, 5),
+                          child: CustomPasswordTextFormField(
                             controller: passwordController,
-                            autofocus: false,
-                            obscureText: _isObscured,
-                            decoration: InputDecoration(
-                              hintText: 'Password',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                              ),
-                              labelText: 'Password',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD2D7DE),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as enabled border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for focused error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as focused border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorStyle: const TextStyle(
-                                // Style for the error message
-                                color: Color(0xFFD50032),
-                                // Change color to red for error message
-                                fontSize: 12, // Adjust font size as needed
-                              ),
-                              suffixIcon: InkWell(
-                                onTap: () =>
-                                    setState(() => _isObscured = !_isObscured),
-                                child: Icon(
-                                  _isObscured
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  color: Color(0xFFD50032),
-                                  size: 22,
-                                ),
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            onChanged: (input) {
-                              _formKey.currentState!.validate();
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your password';
-                              }
-                              if (value.length < 6) {
-                                return 'Password must be at least 6 characters long';
-                              }
-                              return null;
-                            },
+                            hintText: 'Password',
+                            labelText: 'Password',
+                            isPassword: true,
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
-                          child: TextFormField(
+                              10, 5, 10, 5),
+                          child: CustomPasswordTextFormField(
                             controller: conPasswordController,
-                            autofocus: false,
-                            obscureText: _isObscured,
-                            decoration: InputDecoration(
-                              hintText: 'Confirm Password',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                              ),
-                              labelText: 'Confirm Password',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD2D7DE),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as enabled border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for focused error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as focused border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorStyle: const TextStyle(
-                                // Style for the error message
-                                color: Color(0xFFD50032),
-                                // Change color to red for error message
-                                fontSize: 12, // Adjust font size as needed
-                              ),
-                              suffixIcon: InkWell(
-                                onTap: () =>
-                                    setState(() => _isObscured = !_isObscured),
-                                child: Icon(
-                                  _isObscured
-                                      ? Icons.visibility_off_outlined
-                                      : Icons.visibility_outlined,
-                                  color: Color(0xFFD50032),
-                                  size: 22,
-                                ),
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            onChanged: (input) {
-                              _formKey.currentState!.validate();
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please confirm your password';
-                              }
-                              if (value != passwordController.text) {
-                                return 'Passwords do not match';
-                              }
-                              return null;
-                            },
+                            hintText: 'Confirm Password',
+                            labelText: 'Confirm Password',
+                            isPassword: false,
+                            password: passwordController,
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
-                          child: TextFormField(
+                              10, 5, 10, 5),
+                          child: CustomTextFormField(
+                            labelText: 'Phone Number',
+                            hintText: 'Phone Number',
                             controller: phoneController,
-                            autofocus: false,
-                            obscureText: false,
                             keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: 'Phone Number',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                              ),
-                              labelText: 'Phone Number',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD2D7DE),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for focused error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as focused border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorStyle: const TextStyle(
-                                color: Color(0xFFD50032),
-                                fontSize: 12, // Adjust font size as needed
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            onChanged: (input) {
-                              _formKey.currentState!.validate();
-                            },
-                            validator: (value) {
-                              if (value == null || value.isEmpty) {
-                                return 'Please enter your phone number';
-                              }
-                              if (!RegExp(r'^9\d{9}$').hasMatch(value)) {
-                                return 'Please enter a valid 10-digit number starting with 9';
-                              }
-                              return null;
-                            },
+                            type: 'phone_number',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
+                              10, 10, 10, 20),
                           child: Container(
                             padding: const EdgeInsets.only(left: 8.0),
                             decoration: BoxDecoration(
-                              // color:
-                              // const Color.fromARGB(
-                              //     255, 40, 40, 40),
                               border: Border.all(
                                 color: Color(0xFFD2D7DE),
                                 width: 2,
@@ -617,28 +256,23 @@ class _SignUpForWebState extends State<SignUpForWeb> {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 color: const Color(0xFFD50032),
-                                fontWeight: FontWeight.w600,
                                 fontSize: 16,
                               ),
                               hint: Text(
-                                // 'प्रदेश छान्नुहोस्',
                                 'Select the province',
-                                style: TextStyle(fontSize: 16),
+                                style: TextStyle(
+                                  fontSize: 16,
+                                  color: Colors.grey,
+                                ),
                               ),
                               icon: const Icon(
                                 Icons.keyboard_arrow_down_rounded,
-                                // color:
-                                // Color(0xFFB3A194),
+                                color: Color(0xFFD50032),
                                 size: 24,
                               ),
-                              // dropdownColor:
-                              // const Color.fromARGB(
-                              //     255, 40, 40, 40),
                               elevation: 2,
                               underline: Container(
                                 height: 0,
-                                // color: const Color(
-                                //     0xFFB3A194),
                               ),
                               isExpanded: true,
                             ),
@@ -646,7 +280,7 @@ class _SignUpForWebState extends State<SignUpForWeb> {
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
+                              10, 10, 10, 20),
                           child: Container(
                             padding: const EdgeInsets.only(left: 8.0),
                             decoration: BoxDecoration(
@@ -670,8 +304,7 @@ class _SignUpForWebState extends State<SignUpForWeb> {
                                                 .toString()
                                                 .replaceAll('District.', ''),
                                             maxLines: 2,
-                                            overflow: TextOverflow
-                                                .ellipsis, // Truncates if needed
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       );
@@ -686,8 +319,7 @@ class _SignUpForWebState extends State<SignUpForWeb> {
                                           child: Text(
                                             dis,
                                             maxLines: 2,
-                                            overflow: TextOverflow
-                                                .ellipsis, // Truncates if needed
+                                            overflow: TextOverflow.ellipsis,
                                           ),
                                         ),
                                       );
@@ -703,31 +335,23 @@ class _SignUpForWebState extends State<SignUpForWeb> {
                               style: TextStyle(
                                 fontFamily: 'Poppins',
                                 color: const Color(0xFFD50032),
-                                fontWeight: FontWeight.w600,
                                 fontSize: 16,
                               ),
                               hint: Text(
                                 'Select the district',
                                 style: TextStyle(
-                                  // color: const Color(
-                                  //     0xFFB3A194),
                                   fontSize: 16,
+                                  color: Colors.grey,
                                 ),
                               ),
                               icon: const Icon(
                                 Icons.keyboard_arrow_down_rounded,
-                                // color:
-                                // Color(0xFFB3A194),
+                                color: Color(0xFFD50032),
                                 size: 24,
                               ),
-                              // dropdownColor:
-                              // const Color.fromARGB(
-                              //     255, 40, 40, 40),
                               elevation: 2,
                               underline: Container(
                                 height: 0,
-                                // color: const Color(
-                                //     0xFFB3A194),
                               ),
                               isExpanded: true,
                             ),
@@ -735,131 +359,31 @@ class _SignUpForWebState extends State<SignUpForWeb> {
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
-                          child: TextFormField(
+                              10, 5, 10, 5),
+                          child: CustomTextFormField(
+                            labelText: 'Address',
+                            hintText: 'Address',
                             controller: addressController,
-                            autofocus: false,
-                            obscureText: false,
                             keyboardType: TextInputType.text,
-                            decoration: InputDecoration(
-                              hintText: 'Address',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                              ),
-                              labelText: 'Address',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as enabled border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedErrorBorder: OutlineInputBorder(
-                                // Optional: Keep same design for focused error
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  // Keep the same color as focused border
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              errorStyle: const TextStyle(
-                                // Style for the error message
-                                color: Color(0xFFD50032),
-                                // Change color to red for error message
-                                fontSize: 12, // Adjust font size as needed
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
-                            onChanged: (input) {
-                              _formKey.currentState!.validate();
-                            },
-                            validator: (value) {
-                              // if (value == null || value.isEmpty) {
-                              //   return 'Please enter your Address';
-                              // }
-                              // if (!RegExp(r'^[a-zA-Z\s]+$').hasMatch(value)) {
-                              //   return 'Please enter a valid name (letters and spaces only)';
-                              // }
-                              return null;
-                            },
+                            type: 'Address',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
-                              10, 10, 10, 10),
-                          child: TextFormField(
+                              10, 5, 10, 5),
+                          child: CustomTextFormField(
+                            labelText: 'Secondary Number',
+                            hintText: 'Secondary Number',
                             controller: secPhoneController,
-                            autofocus: true,
-                            obscureText: false,
-                            keyboardType: TextInputType.number,
-                            decoration: InputDecoration(
-                              hintText: 'Secondary Number',
-                              hintStyle: TextStyle(
-                                color: Colors.grey[500],
-                                fontSize: 14,
-                                fontFamily: 'Poppins',
-                              ),
-                              labelText: 'Secondary Number',
-                              labelStyle: TextStyle(
-                                color: Colors.black,
-                                fontFamily: 'Poppins',
-                                fontSize: 16,
-                              ),
-                              floatingLabelBehavior: FloatingLabelBehavior.auto,
-                              enabledBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Colors.grey,
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                              focusedBorder: OutlineInputBorder(
-                                borderSide: const BorderSide(
-                                  color: Color(0xFFD50032),
-                                  width: 2,
-                                ),
-                                borderRadius: BorderRadius.circular(8),
-                              ),
-                            ),
-                            style: const TextStyle(
-                              fontSize: 16,
-                              fontWeight: FontWeight.w600,
-                            ),
+                            keyboardType: TextInputType.text,
+                            type: 'Secondary_Number',
                           ),
                         ),
                         Padding(
                           padding: const EdgeInsetsDirectional.fromSTEB(
                               15, 15, 15, 5),
                           child: SizedBox(
-                            height: 45,
+                            height: 50,
                             child: ElevatedButton(
                               onPressed: () async {
                                 if (_formKey.currentState!.validate()) {

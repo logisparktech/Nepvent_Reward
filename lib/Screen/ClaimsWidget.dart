@@ -16,8 +16,6 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
   String? _selectedVendorName;
 
   List<VendorModel> vendorName = [];
-  List<InvoiceModel> invoiceData = [];
-  List<InvoiceModel> filterInvoiceData = [];
 
   @override
   void initState() {
@@ -51,10 +49,10 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
     }
   }
 
-  _getInvoiceData() async {
+  Future _getInvoiceData() async {
     try {
       final Response response = await dio.get(urls['GetInvoice']!);
-      // debugPrint(' data :  ${response.data}');
+
       List<InvoiceModel> newInvoiceData = [];
       for (var invoice in response.data['data']['invoices']) {
         newInvoiceData.add(
@@ -67,39 +65,21 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
           ),
         );
       }
-      setState(() {
-        invoiceData = newInvoiceData;
-      });
-      debugPrint('Invoice Data :  $invoiceData');
+
+      return newInvoiceData;
     } catch (error) {
       debugPrint('Error Getting Invoice $error');
+      return [];
     }
-  }
-
-  _updateFilteredVendor() {
-    if (_selectedVendorName == null) {
-      filterInvoiceData = invoiceData;
-    } else {
-      filterInvoiceData = invoiceData
-          .where((element) =>
-              element.vendorName.toLowerCase() ==
-              _selectedVendorName!.toLowerCase())
-          .toList();
-    }
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
   }
 
   @override
   Widget build(BuildContext context) {
-    _updateFilteredVendor();
+    // _updateFilteredVendor();
     Size screen = MediaQuery.sizeOf(context);
     bool isWeb = screen.width >= 900;
     return Scaffold(
+      backgroundColor: Colors.white,
       body: SafeArea(
           child: Column(
         children: [
@@ -112,7 +92,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                 // color:
                 // const Color.fromARGB(255, 40, 40, 40),
                 border: Border.all(
-                  color: Colors.grey,
+                  color: Color(0xFFD2D7DE),
                   width: 2,
                 ),
                 borderRadius: BorderRadius.circular(8.0),
@@ -155,52 +135,79 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                 ),
                 icon: const Icon(
                   Icons.keyboard_arrow_down_rounded,
-                  color: Color(0xFFB3A194),
                   size: 20,
                 ),
                 // dropdownColor: const Color.fromARGB(255, 40, 40, 40),
                 elevation: 1,
                 underline: Container(
                   height: 0,
-                  color: const Color(0xFFB3A194),
                 ),
               ),
             ),
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: filterInvoiceData == null || filterInvoiceData.isEmpty
-                ? Center(
-                    child: Column(
-                      children: [
-                        Icon(
-                          Icons.error_sharp,
-                          color: Color(0xFFDD143D),
-                        ),
-                        Text(
-                          "No claims found",
-                          style: TextStyle(
-                            color: Color(0xFFDD143D),
+            child: FutureBuilder(
+              future: _getInvoiceData(),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return Center(
+                    child: CircularProgressIndicator(
+                      color: const Color(0xFFDD143D),
+                    ),
+                  );
+                } else if (snapshot.hasError) {
+                  return Center(
+                    child: Text('Error: ${snapshot.error}'),
+                  );
+                } else {
+                  List<InvoiceModel> filterInvoiceData = [];
+
+                  if (_selectedVendorName != null) {
+                    filterInvoiceData = filterInvoiceData
+                        .where((element) =>
+                            element.vendorName.toLowerCase() ==
+                            _selectedVendorName!.toLowerCase())
+                        .toList();
+                  } else {
+                    filterInvoiceData = snapshot.data!;
+                  }
+
+                  return filterInvoiceData == null || filterInvoiceData.isEmpty
+                      ? Center(
+                          child: Column(
+                            children: [
+                              Icon(
+                                Icons.error_sharp,
+                                color: Color(0xFFDD143D),
+                              ),
+                              Text(
+                                "No claims found",
+                                style: TextStyle(
+                                  color: Color(0xFFDD143D),
+                                ),
+                              )
+                            ],
                           ),
                         )
-                      ],
-                    ),
-                  )
-                : isWeb
-                    ? buildContainer(screen)
-                    : buildForMobile(screen),
+                      : isWeb
+                          ? buildContainer(screen, filterInvoiceData)
+                          : buildForMobile(screen, filterInvoiceData);
+                }
+              },
+            ),
           ),
         ],
       )),
     );
   }
 
-  Container buildContainer(Size screen) {
+  Container buildContainer(Size screen, List filterInvoiceData) {
     return Container(
       width: screen.width,
       decoration: BoxDecoration(
         // color: Colors.greenAccent,
-        border: Border.all(color: Colors.grey),
+        border: Border.all(color: Color(0xFFD2D7DE)),
         borderRadius: BorderRadius.circular(8),
       ),
       child: DataTable(
@@ -265,7 +272,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
     );
   }
 
-  Widget buildForMobile(Size screen) {
+  Widget buildForMobile(Size screen, List filterInvoiceData) {
     return SizedBox(
       height: screen.height / 1.41,
       child: ListView(
@@ -276,7 +283,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
             width: screen.width,
 
             decoration: BoxDecoration(
-              border: Border.all(color: Colors.grey),
+              border: Border.all(color: Color(0xFFD2D7DE)),
               borderRadius: BorderRadius.circular(8),
             ),
             margin: EdgeInsets.symmetric(vertical: 8.0),
@@ -284,7 +291,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
             child: Column(
               children: [
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -300,7 +307,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -316,7 +323,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [
@@ -332,7 +339,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                   ),
                 ),
                 Padding(
-                  padding: EdgeInsets.symmetric(horizontal: 8.0),
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                   child: Row(
                     mainAxisAlignment: MainAxisAlignment.spaceBetween,
                     children: [

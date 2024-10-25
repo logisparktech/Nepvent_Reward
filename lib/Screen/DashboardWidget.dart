@@ -1,8 +1,9 @@
 import 'package:flutter/material.dart';
+import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
 import 'package:nepvent_reward/Screen/HomeWidget.dart';
-import 'package:nepvent_reward/Screen/Web/LoginForWebWidget.dart';
 import 'package:nepvent_reward/Screen/LoginWidget.dart';
 import 'package:nepvent_reward/Screen/VendorWidget.dart';
+import 'package:nepvent_reward/Screen/Web/LoginForWebWidget.dart';
 
 class DashboardWidget extends StatefulWidget {
   const DashboardWidget({
@@ -79,10 +80,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
       }
 
       return Scaffold(
-        appBar: 
-
-
-        AppBar(
+        appBar: AppBar(
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
           title: isWeb
@@ -101,6 +99,8 @@ class _DashboardWidgetState extends State<DashboardWidget> {
           actions: [
             isWeb
                 ? PopupMenuButton(
+                    position: PopupMenuPosition.under,
+                    color: Colors.white,
                     onSelected: (String value) {
                       if (value == 'Home') {
                         Navigator.push(
@@ -128,7 +128,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                             value: 'Home',
                             child: Row(
                               children: [
-                                Icon(Icons.home),
+                                Icon(MdiIcons.homeOutline),
                                 SizedBox(
                                   width: 4,
                                 ),
@@ -139,7 +139,7 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                           value: 'Vendor',
                           child: Row(
                             children: [
-                              Icon(Icons.business_outlined),
+                              Icon(MdiIcons.selectGroup),
                               SizedBox(
                                 width: 4,
                               ),
@@ -149,7 +149,10 @@ class _DashboardWidgetState extends State<DashboardWidget> {
                         ),
                       ];
                     },
-                    child: Icon(Icons.menu_sharp),
+                    child: Icon(
+                      MdiIcons.dotsGrid,
+                      size: 30,
+                    ),
                   )
                 : const Material(),
             isWeb
@@ -222,13 +225,13 @@ class _DashboardWidgetState extends State<DashboardWidget> {
         bottomNavigationBar: isMobile || isTablet
             ? BottomNavigationBar(
           backgroundColor: Colors.white,
-                items: const <BottomNavigationBarItem>[
+                items: <BottomNavigationBarItem>[
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.home),
+                    icon: Icon(MdiIcons.homeOutline),
                     label: 'Home',
                   ),
                   BottomNavigationBarItem(
-                    icon: Icon(Icons.business_outlined),
+                    icon: Icon(MdiIcons.selectGroup),
                     label: 'Vendors',
                   ),
                 ],

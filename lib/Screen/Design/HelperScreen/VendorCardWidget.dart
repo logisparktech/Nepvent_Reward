@@ -18,7 +18,8 @@ class VendorCardWidget extends StatelessWidget {
     required this.imageUrl,
     required this.address,
     required this.description,
-    required this.phone, required this.isLogin,
+    required this.phone,
+    required this.isLogin,
   });
 
   @override
@@ -51,7 +52,7 @@ class VendorCardWidget extends StatelessWidget {
                 ClipRRect(
                   borderRadius: BorderRadius.circular(16),
                   child: SizedBox(
-                    width: 315,
+                    width: 300,
                     height: 200,
                     child: CachedNetworkImage(
                       imageUrl: imageUrl,
