@@ -9,4 +9,7 @@ final Map<String, String> urls = {
   'updateUser' : ' api/users',
   'profilePicture': 'api/assets/upload?useAsDisplayPicture=true',
   'GetInvoice': 'api/invoice/customer',
+  'Notification': 'api/notification?status=approved',
+  'ViewNotification': 'api/notification/viewedNotification',
+
 };

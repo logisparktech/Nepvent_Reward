@@ -1,12 +1,17 @@
+import 'package:dio/dio.dart';
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:nepvent_reward/Model/NotificationModel.dart';
 import 'package:nepvent_reward/Screen/ClaimsWidget.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
 import 'package:nepvent_reward/Screen/HomeWidget.dart';
+import 'package:nepvent_reward/Screen/NotificationWidget.dart';
 import 'package:nepvent_reward/Screen/ProfileWidget.dart';
 import 'package:nepvent_reward/Screen/SubscriptionWidget.dart';
 import 'package:nepvent_reward/Screen/VendorWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
+import 'package:nepvent_reward/Utils/Urls.dart';
 
 class LoginDashboardWidget extends StatefulWidget {
    LoginDashboardWidget({
@@ -31,6 +36,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
   late double vendorCardWidth;
   late double cardHeight;
   late String profileAvatar;
+  late String currentUserId;
 
   @override
   void initState() {
@@ -38,6 +44,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
     super.initState();
     _selectedIndex = widget.tabIndex ?? 0;
     _getProfileAvatar();
+    _getNotificationData();
   }
 
   final List<Widget> _pages = [
@@ -55,6 +62,48 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
     'Profile',
   ];
 
+  Future _getNotificationData() async {
+    try {
+      final Response response = await dio.get(urls['Notification']!);
+      final body = response.data['data']['data'];
+      // debugPrint(" *********** Notification Body ***********  $body");
+
+      List<NotificationModel> newNotificationData = [];
+      body.forEach((item) {
+        List<NotificationPicture> pictures =
+            (item['notificationPicture'] as List)
+                .map((pic) => NotificationPicture(
+                      id: pic['_id'],
+                      url: pic['url'],
+                    ))
+                .toList();
+
+        newNotificationData.add(
+          NotificationModel(
+            id: item['_id'],
+            notificationPicture: pictures,
+            viewedUser: item['viewedUser'],
+            title: item['title'],
+            content: item['content'],
+            date: DateTime.parse(item['date']),
+            time: item['time'],
+            redirectedUrl: item.containsKey('redirectedUrl')
+                ? item['redirectedUrl']
+                : '',
+          ),
+        );
+      });
+
+      setState(() {
+        notificationModel = newNotificationData;
+      });
+
+      // log('****** notification Data  ******* : $notificationModel');
+    } catch (e) {
+      print("Error Fetching notification data: $e");
+    }
+  }
+
   void _onItemTapped(int index) {
     setState(() {
       _selectedIndex = index;
@@ -62,8 +111,31 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
   }
   _getProfileAvatar() async{
     var profilePic = await secureStorage.read(key:'ProfilePic') ??'';
-    // debugPrint('check check ******** $profilePic');
+    currentUserId = await secureStorage.read(key: 'userID') ?? '';
     profileAvatar = profilePic;
+  }
+
+  void _markAsSeen(String id) async {
+    debugPrint('id :$id');
+    debugPrint('current user :$currentUserId');
+    try {
+      final Response response =
+          await dio.post('${urls['ViewNotification']}/$id/$currentUserId');
+      if (response.statusCode == 201) {
+        setState(() {
+          notificationModel = notificationModel.map((notification) {
+            if (notification.id == id) {
+              notification.viewedUser.add(currentUserId);
+            }
+            return notification;
+          }).toList();
+        });
+      }
+    } on DioException catch (err) {
+      debugPrint('notification View Dio Error :$err');
+    } catch (err) {
+      debugPrint('notification View Error :$err');
+    }
   }
 
   @override
@@ -96,6 +168,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
       profileAvatar = widget.profileUrl!;
 
       return Scaffold(
+        backgroundColor: Colors.white,
         appBar: AppBar(
           backgroundColor: Colors.white,
           automaticallyImplyLeading: false,
@@ -113,6 +186,100 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                   _title[_selectedIndex],
                 ),
           actions: [
+            kIsWeb
+                ? Padding(
+                    padding: const EdgeInsets.all(8.0),
+                    child: PopupMenuButton(
+                      tooltip: 'Notification',
+                      position: PopupMenuPosition.under,
+                      color: Colors.white,
+                      onSelected: (String value) {
+                        _markAsSeen(value);
+                        debugPrint('Notification Value: $value');
+                      },
+                      itemBuilder: (BuildContext context) {
+                        return notificationModel.map((notification) {
+                          final bool isSeen =
+                              notification.viewedUser.contains(currentUserId);
+
+                          return PopupMenuItem(
+                            value: notification.id.toString(),
+                            child: SizedBox(
+                              width: MediaQuery.of(context).size.width * 0.8,
+                              child: Row(
+                                children: [
+                                  Expanded(
+                                    child: Padding(
+                                      padding: const EdgeInsets.only(
+                                          top: 4.0, bottom: 4.0),
+                                      child: Column(
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.start,
+                                        children: [
+                                          Text(
+                                            notification.title,
+                                            maxLines: 1,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: Colors.grey[700],
+                                              fontSize: 16,
+                                              fontWeight: FontWeight.w600,
+                                              fontFamily: 'Poppins',
+                                            ),
+                                          ),
+                                          SizedBox(height: 2),
+                                          Text(
+                                            notification.content,
+                                            maxLines: 2,
+                                            overflow: TextOverflow.ellipsis,
+                                            style: TextStyle(
+                                              color: Colors.grey,
+                                              fontSize: 14,
+                                              fontWeight: FontWeight.w500,
+                                              fontFamily: 'Poppins',
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  ),
+                                  if (!isSeen)
+                                    SizedBox(
+                                      width: 10,
+                                      child: Center(
+                                        child: Icon(
+                                          MdiIcons.circle,
+                                          size: 10,
+                                          color: Color(0xFFD50032),
+                                        ),
+                                      ),
+                                    ),
+                                ],
+                              ),
+                            ),
+                          );
+                        }).toList();
+                      },
+                      child: Icon(
+                        MdiIcons.bell,
+                        size: 30,
+                      ),
+                    ),
+                  )
+                : IconButton(
+                    onPressed: () {
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (context) => NotificationWidget(),
+                        ),
+                      );
+                    },
+                    icon: Icon(
+                      MdiIcons.bell,
+                      size: 30,
+                    ),
+                  ),
             Padding(
               padding: const EdgeInsets.only(right: 24),
               child: Row(

@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nepvent_reward/Model/ProfileModel.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
+import 'package:nepvent_reward/Screen/PointWidget.dart';
 import 'package:nepvent_reward/Utils/Enum.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
@@ -321,48 +322,77 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            // color: Colors.greenAccent,
-                            border: Border.all(
-                              color: Color(0xFFD2D7DE),
+                        child: ElevatedButton(
+                          onPressed: () {
+                            Navigator.push(
+                              context,
+                              MaterialPageRoute(
+                                builder: (context) => PointWidget(),
+                              ),
+                            );
+                          },
+                          style: ElevatedButton.styleFrom(
+                            backgroundColor: const Color(0xFFDD143D),
+                            // Button color
+                            shape: RoundedRectangleBorder(
+                              borderRadius:
+                                  BorderRadius.circular(10), // Rounded edges
                             ),
-                            borderRadius: BorderRadius.circular(8),
+                            padding: EdgeInsets.symmetric(
+                                horizontal: 50,
+                                vertical: 15), // Padding to enlarge the button
                           ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 16.0, left: 12, bottom: 16),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
-                                  user!.point.toString(),
-                                  // "350",
-                                  style: TextStyle(
-                                    color: const Color(0xFFDD143D),
-                                    fontSize: 32,
-                                    fontWeight: FontWeight.w600,
-                                  ),
-                                ),
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.star,
-                                      color: const Color(0xFFDD143D),
-                                      size: 15,
-                                    ),
-                                    Text(
-                                      " Accumulated Points ",
-                                      style: TextStyle(
-                                        fontSize: 14,
-                                      ),
-                                    )
-                                  ],
-                                )
-                              ],
+                          child: Text(
+                            'show Points',
+                            style: TextStyle(
+                              color: Colors.white, // Text color
+                              fontSize: 16, // Font size
+                              fontWeight: FontWeight.bold, // Bold text
                             ),
                           ),
                         ),
+                        // Container(
+                        //   decoration: BoxDecoration(
+                        //     // color: Colors.greenAccent,
+                        //     border: Border.all(
+                        //       color: Color(0xFFD2D7DE),
+                        //     ),
+                        //     borderRadius: BorderRadius.circular(8),
+                        //   ),
+                        //   child: Padding(
+                        //     padding: const EdgeInsets.only(
+                        //         top: 16.0, left: 12, bottom: 16),
+                        //     child: Column(
+                        //       crossAxisAlignment: CrossAxisAlignment.start,
+                        //       children: [
+                        //         Text(
+                        //           user!.point.toString(),
+                        //           // "350",
+                        //           style: TextStyle(
+                        //             color: const Color(0xFFDD143D),
+                        //             fontSize: 32,
+                        //             fontWeight: FontWeight.w600,
+                        //           ),
+                        //         ),
+                        //         Row(
+                        //           children: [
+                        //             Icon(
+                        //               Icons.star,
+                        //               color: const Color(0xFFDD143D),
+                        //               size: 15,
+                        //             ),
+                        //             Text(
+                        //               " Accumulated Points ",
+                        //               style: TextStyle(
+                        //                 fontSize: 14,
+                        //               ),
+                        //             )
+                        //           ],
+                        //         )
+                        //       ],
+                        //     ),
+                        //   ),
+                        // ),
                       ),
                       Padding(
                         padding: const EdgeInsets.all(16.0),
