@@ -22,13 +22,6 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
       final Response response = await dio.get('${urls['profile']}/$userID');
       final body = response.data['data'];
 
-      var vendorLoyaltyPoints = body['vendorLoyaltyPoints'] as List;
-      int totalPoints = vendorLoyaltyPoints
-          .where((pointData) =>
-              pointData is Map && pointData.containsKey('points'))
-          .map((pointData) => pointData['points'] as int)
-          .fold(0, (sum, points) => sum + points);
-
       if (body['displayPicture']?.containsKey('url') == true) {
         profilePic = body['displayPicture']['url'].toString();
       }
@@ -37,7 +30,6 @@ class _SubscriptionWidgetState extends State<SubscriptionWidget> {
         id: body['_id'],
         name: body['name'],
         email: body['email'],
-        point: totalPoints,
         phone: body['phone'],
         district: body['userDetail']['district'],
         address: body['userDetail']['address'],

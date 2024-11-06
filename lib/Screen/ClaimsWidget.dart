@@ -6,7 +6,9 @@ import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
 
 class ClaimsWidget extends StatefulWidget {
-  const ClaimsWidget({super.key});
+  const ClaimsWidget({
+    super.key,
+  });
 
   @override
   State<ClaimsWidget> createState() => _ClaimsWidgetState();
@@ -23,6 +25,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
     super.initState();
     _getVendorData();
     _getInvoiceData();
+    // _selectedVendorName
   }
 
   _getVendorData() async {
@@ -49,7 +52,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
     }
   }
 
-  Future _getInvoiceData() async {
+  Future<List<InvoiceModel>> _getInvoiceData() async {
     try {
       final Response response = await dio.get(urls['GetInvoice']!);
 
@@ -58,14 +61,13 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
         newInvoiceData.add(
           InvoiceModel(
             vendorName: invoice['vendor']['name'],
-            tableName: invoice['tableName'],
+            tableName: invoice['tableName']??'',
             discount: invoice['discountPercent'],
             invoiceNumber: invoice['invoiceNumber'],
             finalAmount: invoice['finalAmount'],
           ),
         );
       }
-
       return newInvoiceData;
     } catch (error) {
       debugPrint('Error Getting Invoice $error');
@@ -147,7 +149,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
           ),
           Padding(
             padding: EdgeInsets.symmetric(horizontal: 16.0),
-            child: FutureBuilder(
+            child: FutureBuilder<List<InvoiceModel>>(
               future: _getInvoiceData(),
               builder: (context, snapshot) {
                 if (snapshot.connectionState == ConnectionState.waiting) {
@@ -162,7 +164,6 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                   );
                 } else {
                   List<InvoiceModel> filterInvoiceData = [];
-
                   if (_selectedVendorName != null) {
                     filterInvoiceData = filterInvoiceData
                         .where((element) =>

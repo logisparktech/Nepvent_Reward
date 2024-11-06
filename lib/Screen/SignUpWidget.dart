@@ -75,7 +75,7 @@ class _SignUpWidgetState extends State<SignUpWidget> {
         await secureStorage.write(key: 'token', value: token);
         await secureStorage.write(
             key: 'userID',
-            value: response.data['data']['user']['id'].toString());
+            value: response.data['data']['user']['_id'].toString());
         Navigator.push(
           context,
           MaterialPageRoute(

@@ -28,7 +28,7 @@ class _CheckState extends State<Check> {
     _getUserDetails().then((value) {
       if (value != null) {
         setState(() {
-          var ipAddress ='http://192.168.1.154:4000/notification';
+          var ipAddress =dotenv.env['SOCKET_API_URL']!;
           token = value['token'];
           if (token != null && token != '') {
             print('socket connection hit');

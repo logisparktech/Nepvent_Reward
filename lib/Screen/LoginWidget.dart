@@ -55,6 +55,7 @@ class _LoginWidgetState extends State<LoginWidget> {
       debugPrint(response.statusMessage);
       if (response.statusCode == 201) {
         var token = response.data['data']['token'];
+        debugPrint('id: ${response.data['data']['_id']}');
 
         await secureStorage.write(
           key: 'token',
@@ -62,7 +63,7 @@ class _LoginWidgetState extends State<LoginWidget> {
         );
         await secureStorage.write(
           key: 'userID',
-          value: response.data['data']['id'].toString(),
+          value: response.data['data']['_id'].toString(),
         );
         if (response.data['data']?.containsKey('displayPicture') == true &&
             response.data['data']['displayPicture']?.containsKey('url') ==

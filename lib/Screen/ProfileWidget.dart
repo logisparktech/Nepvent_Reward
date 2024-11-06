@@ -5,6 +5,7 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:image_picker/image_picker.dart';
 import 'package:nepvent_reward/Model/ProfileModel.dart';
+import 'package:nepvent_reward/Model/VendorDetailModel.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
 import 'package:nepvent_reward/Screen/PointWidget.dart';
 import 'package:nepvent_reward/Utils/Enum.dart';
@@ -47,13 +48,37 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       final body = response.data['data'];
 
 
-        var vendorLoyaltyPoints = body['vendorLoyaltyPoints'] as List;
-         int totalPoints = vendorLoyaltyPoints
-            .where((pointData) =>
-        pointData is Map && pointData.containsKey('points'))
-            .map((pointData) => pointData['points'] as int)
-            .fold(0, (sum, points) => sum + points);
+      var vendorLoyaltyPoints = body['vendorLoyaltyPoints'] as List;
+      // List<VendorDetailModel> vendorDetails = [];
 
+      for (var pointData in vendorLoyaltyPoints) {
+        if (pointData is Map &&
+            pointData.containsKey('points') &&
+            pointData.containsKey('vendor')) {
+          final vendor = pointData['vendor'] as Map;
+          final vendorName = vendor['name'] as String;
+          final vId = vendor['_id'] as String;
+          final points = pointData['points'] as int;
+
+          vendorDetailModel.clear();
+          vendorDetailModel.add(
+            VendorDetailModel(
+              vendorName: vendorName,
+              points: points,
+              vId: vId,
+              address: vendor['address'],
+              description: vendor['description'],
+              phone: vendor['phone'],
+              imageUrl: 'https://rms.nepvent.com/assets/nepvent-default-banner.69b2a990.png',
+            ),
+          );
+
+          // setState(() {
+          //   vendorDetailModel = vendorDetails;
+          // });
+          debugPrint('Vendor Detail : $vendorDetailModel');
+        }
+      }
 
       if (body['displayPicture']?.containsKey('url') == true) {
         profilePic = body['displayPicture']['url'].toString();
@@ -63,15 +88,15 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         id: body['_id'],
         name: body['name'],
         email: body['email'],
-        point: totalPoints,
         phone: body['phone'],
-        district: body['userDetail']['district']??'',
-        address: body['userDetail']['address'],
-        province: body['userDetail']['province']??'',
-        secondaryNumber: body['userDetail']['secondaryNumber'],
+        district: body['userDetail']['district'] ?? '',
+        address: body['userDetail']['address']??'',
+        province: body['userDetail']['province'] ?? '',
+        secondaryNumber: body['userDetail']['secondaryNumber']?? '',
         avatarUrl: profilePic,
         memberId: body['membershipId'],
       );
+
 
       // Set the address controller text
       addressController.text = profileData.address;
@@ -80,6 +105,9 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       secondaryNumberController.text = profileData.secondaryNumber;
 
       return profileData;
+
+    } on DioException catch(err){
+      print("Error Fetching Profile data: $err");
     } catch (e) {
       print("Error Fetching Profile data: $e");
       return null; // Return null in case of error

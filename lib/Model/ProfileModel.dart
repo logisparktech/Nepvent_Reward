@@ -1,6 +1,5 @@
 class ProfileModel {
   final String id;
-  final int point;
   final String memberId;
   final String name;
   final String email;
@@ -15,7 +14,6 @@ class ProfileModel {
     required this.id,
     required this.name,
     required this.email,
-    required this.point,
     required this.phone,
     required this.district,
     required this.address,

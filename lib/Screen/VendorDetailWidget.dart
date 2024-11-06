@@ -31,7 +31,7 @@ class VendorDetailWidget extends StatefulWidget {
 }
 
 class _VendorDetailWidgetState extends State<VendorDetailWidget> {
-  late String profileAvatar;
+  String? profileAvatar;
 
   @override
   void initState() {
@@ -82,10 +82,11 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
     bool isWeb = screen.width >= 900;
 
     return Scaffold(
+      backgroundColor: Colors.white,
       appBar: widget.isLogin
           ? AppBar(
-              backgroundColor: Colors.grey[300],
-              automaticallyImplyLeading: false,
+              backgroundColor: Colors.white,
+              automaticallyImplyLeading: kIsWeb ? false : true,
               title: isWeb
                   ? Row(
                       children: [
@@ -287,8 +288,8 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                 },
                                 child: CircleAvatar(
                                   backgroundImage: profileAvatar != null &&
-                                          profileAvatar.isNotEmpty
-                                      ? NetworkImage(profileAvatar)
+                                          profileAvatar!.isNotEmpty
+                                      ? NetworkImage(profileAvatar!)
                                       : AssetImage(
                                           'assets/images/man-avatar-profile.jpeg'),
                                   // Fallback to a local asset
@@ -464,140 +465,317 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                   errorWidget: (context, url, error) => Icon(Icons.error),
                 ),
               ),
-              Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                child: Column(
-                  mainAxisAlignment: MainAxisAlignment.start,
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  children: [
-                    Row(
-                      mainAxisAlignment: kIsWeb
-                          ? MainAxisAlignment.start
-                          : MainAxisAlignment.spaceBetween,
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.only(right: 16),
-                          child: Text(
-                            widget.vendorName,
-                            style: TextStyle(
-                              fontSize: 26,
-                              fontWeight: FontWeight.w600,
+              Container(
+                constraints: BoxConstraints(
+                  maxWidth: 1600, // Equivalent to max-width: 1600px
+                ),
+                width: MediaQuery.sizeOf(context)
+                    .width, // Equivalent to width: 100%
+                child: Padding(
+                  padding:
+                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
+                  child: Column(
+                    mainAxisAlignment: MainAxisAlignment.start,
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Row(
+                        children: [
+                          SizedBox(
+                            width:kIsWeb? screen.width / 2.5: null,
+                            // height: 105,
+                            child: Column(
+                              mainAxisAlignment: MainAxisAlignment.start,
+                              crossAxisAlignment: CrossAxisAlignment.start,
+                              children: [
+                                FittedBox(
+                                  child: Row(
+                                    mainAxisAlignment: kIsWeb
+                                        ? MainAxisAlignment.start
+                                        : MainAxisAlignment.spaceBetween,
+                                    children: [
+                                      Padding(
+                                        padding:
+                                            const EdgeInsets.only(right: 16),
+                                        child: SizedBox(
+                                          width: kIsWeb
+                                              ? null
+                                              : screen.width * 0.67,
+                                          child: Text(
+                                            widget.vendorName,
+                                            overflow: TextOverflow.fade,
+                                            style: TextStyle(
+                                              fontSize: 26,
+                                              fontWeight: FontWeight.w600,
+                                            ),
+                                          ),
+                                        ),
+                                      ),
+                                      kIsWeb
+                                          ? buildContainerForWeb(
+                                              widget.discount)
+                                          : buildContainerForMobile(
+                                              widget.discount),
+                                    ],
+                                  ),
+                                ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Icon(
+                                        Icons.location_on_outlined,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Text(
+                                        widget.address,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                                Row(
+                                  children: [
+                                    Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Icon(
+                                        Icons.call,
+                                        color: Colors.grey,
+                                      ),
+                                    ),
+                                    Padding(
+                                      padding: const EdgeInsets.all(4.0),
+                                      child: Text(
+                                        widget.phone,
+                                        style: TextStyle(
+                                          fontSize: 15,
+                                          color: Colors.grey,
+                                        ),
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ],
                             ),
                           ),
-                        ),
-                        kIsWeb
-                            ? buildContainerForWeb(widget.discount)
-                            : buildContainerForMobile(widget.discount),
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Icon(
-                            Icons.location_on_outlined,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Text(
-                            widget.address,
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Row(
-                      children: [
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Icon(
-                            Icons.call,
-                            color: Colors.grey,
-                          ),
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(4.0),
-                          child: Text(
-                            widget.phone,
-                            // '9869432555',
-                            style: TextStyle(
-                              fontSize: 15,
-                              color: Colors.grey,
-                            ),
-                          ),
-                        )
-                      ],
-                    ),
-                    Padding(
-                      padding: const EdgeInsets.only(top: 16.0),
-                      child: Text(
-                        widget.description,
-                        // textAlign: TextAlign.justify,
-                        style: TextStyle(
+                          widget.isLogin
+                              ? kIsWeb? Padding(
+                                  padding: const EdgeInsets.only(
+                                      left: 8.0, right: 8.0),
+                                  child: Container(
+                                    width: 1,
+                                    height: 100,
+                                    color: Colors.grey,
+                                  ),
+                                ):Material()
+                              : Material(),
+                          widget.isLogin
+                              ? kIsWeb? Row(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.center,
+                                  children: [
+                                    SizedBox(
+                                      // color: Colors.lightBlue,
+                                      width: 150,
+                                      height: 100,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "Total Spending",
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            "0",
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFFDD143D),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      // color: Colors.lightBlue,
+                                      width: 150,
+                                      height: 100,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "Points Earned",
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            "0",
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFFDD143D),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    SizedBox(
+                                      // color: Colors.lightBlue,
+                                      width: 150,
+                                      height: 100,
+                                      child: Column(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.center,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(8.0),
+                                            child: Text(
+                                              "Discount Claim",
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 16,
+                                                fontWeight: FontWeight.w500,
+                                              ),
+                                            ),
+                                          ),
+                                          Text(
+                                            "0",
+                                            style: TextStyle(
+                                              fontSize: 24,
+                                              fontWeight: FontWeight.w700,
+                                              color: const Color(0xFFDD143D),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                    TextButton.icon(
+                                      onPressed: () {
+                                        Navigator.push(
+                                          context,
+                                          MaterialPageRoute(
+                                            builder: (context) => LoginDashboardWidget(
+                                              profileUrl: '',
+                                              tabIndex: 3,
+                                            ),
+                                          ),
+                                        );
+                                      },
+                                      iconAlignment: IconAlignment.end,
+                                      label: Text(
+                                        "Detail",
+                                        style: TextStyle(
+                                          fontFamily: 'Poppins',
+                                          fontSize: 16,
+                                          fontWeight: FontWeight.w600,
+                                          color: Colors
+                                              .black, // Change the color if needed
+                                        ),
+                                      ),
+                                      icon: Icon(
+                                        Icons.arrow_forward,
+                                        color: Colors
+                                            .black, // Change the color if needed
+                                      ),
+                                    )
+                                  ],
+                                ): Material()
+                              : Material(),
+                        ],
+                      ),
+                      Padding(
+                        padding: const EdgeInsets.only(top: 16.0),
+                        child: Text(
+                          widget.description,
+                          // textAlign: TextAlign.justify,
+                          style: TextStyle(
                             fontFamily: 'Poppins',
                             fontSize: 16,
-                            fontWeight: FontWeight.w500),
-                      ),
-                    )
-                  ],
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               )
             ],
           ),
         ),
       ),
-      bottomNavigationBar: !widget.isLogin
-          ? isMobile || isTablet
-              ? BottomNavigationBar(
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      label: 'Home',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.business_outlined),
-                      label: 'Vendors',
-                    ),
-                  ],
-                  selectedItemColor: Colors.amber[800],
-                  onTap: _onItemTapped,
-                )
-              : const Material()
-          : isMobile || isTablet
-              ? BottomNavigationBar(
-                  items: const <BottomNavigationBarItem>[
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.home),
-                      label: 'Home',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.business_outlined),
-                      label: 'Vendors',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.subscriptions_outlined),
-                      label: 'Subscription',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.receipt_long_outlined),
-                      label: 'Claims',
-                    ),
-                    BottomNavigationBarItem(
-                      icon: Icon(Icons.person_3_outlined),
-                      label: 'Profile',
-                    ),
-                  ],
-                  // currentIndex: _selectedIndex,
-                  selectedItemColor: Color(0xFFDD143D),
-                  unselectedItemColor: Colors.grey[800],
-                  onTap: _onItemTapped,
-                )
-              : const Material(),
+      // bottomNavigationBar: !widget.isLogin
+      //     ? isMobile || isTablet
+      //         ? BottomNavigationBar(
+      //             items: const <BottomNavigationBarItem>[
+      //               BottomNavigationBarItem(
+      //                 icon: Icon(Icons.home),
+      //                 label: 'Home',
+      //               ),
+      //               BottomNavigationBarItem(
+      //                 icon: Icon(Icons.business_outlined),
+      //                 label: 'Vendors',
+      //               ),
+      //             ],
+      //             selectedItemColor: Colors.amber[800],
+      //             onTap: _onItemTapped,
+      //           )
+      //         : const Material()
+      //     : isMobile || isTablet
+      //         ? BottomNavigationBar(
+      //             items: const <BottomNavigationBarItem>[
+      //               BottomNavigationBarItem(
+      //                 icon: Icon(Icons.home),
+      //                 label: 'Home',
+      //               ),
+      //               BottomNavigationBarItem(
+      //                 icon: Icon(Icons.business_outlined),
+      //                 label: 'Vendors',
+      //               ),
+      //               BottomNavigationBarItem(
+      //                 icon: Icon(Icons.subscriptions_outlined),
+      //                 label: 'Subscription',
+      //               ),
+      //               BottomNavigationBarItem(
+      //                 icon: Icon(Icons.receipt_long_outlined),
+      //                 label: 'Claims',
+      //               ),
+      //               BottomNavigationBarItem(
+      //                 icon: Icon(Icons.person_3_outlined),
+      //                 label: 'Profile',
+      //               ),
+      //             ],
+      //             // currentIndex: _selectedIndex,
+      //             selectedItemColor: Color(0xFFDD143D),
+      //             unselectedItemColor: Colors.grey[800],
+      //             onTap: _onItemTapped,
+      //           )
+      //         : const Material(),
     );
   }
 
@@ -623,21 +801,23 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              '$discount%',
+              discount == -1 ? 'FREE' : '$discount%',
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
                 fontSize: 18,
               ),
             ),
-            Text(
-              'OFF',
-              style: TextStyle(
-                color: Colors.white,
-                fontWeight: FontWeight.bold,
-                fontSize: 16,
+            if (discount !=
+                -1) // This will only show "OFF" if discount is not -1
+              Text(
+                'OFF',
+                style: TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                  fontSize: 16,
+                ),
               ),
-            ),
           ],
         ),
       ),
@@ -667,7 +847,7 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
         padding: const EdgeInsets.only(left: 8, right: 8),
         child: Center(
           child: Text(
-            '$discount% OFF ',
+            discount == -1 ? 'FREE' : '$discount% OFF',
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

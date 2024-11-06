@@ -84,7 +84,7 @@ class VendorLimitedOfferWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  '$discount% Off',
+                  discount == -1 ? 'FREE' : '$discount% OFF',
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,
