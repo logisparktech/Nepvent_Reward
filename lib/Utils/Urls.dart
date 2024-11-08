@@ -12,5 +12,6 @@ final Map<String, String> urls = {
   'GetInvoice': 'api/invoice/customer',
   'Notification': 'api/notification?status=approved',
   'ViewNotification': 'api/notification/viewedNotification',
+  'customerInsights': 'api/invoice/customerInsights?vendor=',
 
 };

@@ -24,7 +24,7 @@ class _VendorWidgetState extends State<VendorWidget> {
   late double vendorCardWidth;
   late double cardHeight;
   String? _selectedFilter;
-  String? _selectedOrder;
+  String? _selectedOrder= 'DESC';
   late bool _isLogin;
   List<VendorModel> filteredItems = [];
   List<VendorModel> vendorData = [];
@@ -65,6 +65,8 @@ class _VendorWidgetState extends State<VendorWidget> {
         String imageUrl = (item['assets'] != null && item['assets'].isNotEmpty)
             ? item['assets'][0]['url']
             : 'https://images.pexels.com/photos/1639556/pexels-photo-1639556.jpeg?auto=compress&cs=tinysrgb&w=600'; // Default image URL
+
+        // debugPrint("Vendor Id 🪪🪪🪪: ${item['_id']}");
         newVendorData.add(
           VendorModel(
             imageUrl: imageUrl,
@@ -73,6 +75,7 @@ class _VendorWidgetState extends State<VendorWidget> {
             location: item['address'],
             description: item['description'],
             phone: item['phone'],
+            vId: item['_id'],
           ),
         );
       });
@@ -196,9 +199,11 @@ class _VendorWidgetState extends State<VendorWidget> {
                     leading: Radio(
                       value: 'ASC',
                       groupValue: _selectedOrder,
-                      onChanged: (String? value) {
+                      onChanged: _selectedFilter == null
+                          ? null // Disable if no filter selected
+                          : (String? value) {
                         setState(() {
-                          _selectedOrder = value;
+                          _selectedOrder = value!;
                           Navigator.pop(context);
                           _getVendorData();
                         });
@@ -210,9 +215,11 @@ class _VendorWidgetState extends State<VendorWidget> {
                     leading: Radio(
                       value: 'DESC',
                       groupValue: _selectedOrder,
-                      onChanged: (String? value) {
+                      onChanged: _selectedFilter == null
+                          ? null // Disable if no filter selected
+                          : (String? value) {
                         setState(() {
-                          _selectedOrder = value;
+                          _selectedOrder = value!;
                           Navigator.pop(context);
                           _getVendorData();
                         });
@@ -232,7 +239,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                       debugPrint("Clear All Button Clicked ");
                       setState(() {
                         _selectedFilter = null;
-                        _selectedOrder = null;
+                        _selectedOrder = 'DESC';
                       });
                       _getVendorData();
                       Navigator.pop(context);
@@ -241,7 +248,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                       backgroundColor: Color(0xFFDD153C),
                       foregroundColor: Colors.white,
                       padding:
-                          EdgeInsets.symmetric(horizontal: 16, vertical: 10),
+                      EdgeInsets.symmetric(horizontal: 16, vertical: 10),
                       shape: RoundedRectangleBorder(
                         borderRadius: BorderRadius.circular(10),
                       ),
@@ -260,9 +267,11 @@ class _VendorWidgetState extends State<VendorWidget> {
         );
       },
     ).whenComplete(() {
+      debugPrint('$_selectedOrder');
       setState(() {});
     });
   }
+
 
   // _searchFilterData() {
   //   if (searchController.text.isNotEmpty) {
@@ -433,7 +442,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                       groupValue: _selectedOrder,
                       onChanged: (String? value) {
                         setState(() {
-                          _selectedOrder = value;
+                          _selectedOrder = value!;
                           _getVendorData();
                         });
                       },
@@ -447,7 +456,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                       groupValue: _selectedOrder,
                       onChanged: (String? value) {
                         setState(() {
-                          _selectedOrder = value;
+                          _selectedOrder = value!;
                           _getVendorData();
                         });
                       },
@@ -470,7 +479,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                       // Open the drawer when the button is pressed
                       debugPrint("Filter Button Clicked ");
                       _selectedFilter = null;
-                      _selectedOrder = null;
+                      _selectedOrder = 'DESC';
                       _getVendorData();
                       _scaffoldKey.currentState!.closeDrawer();
                     },
@@ -498,7 +507,6 @@ class _VendorWidgetState extends State<VendorWidget> {
             ],
           ),
         ),
-
         backgroundColor: Colors.white,
         body: SafeArea(
           child: Center(
@@ -573,44 +581,94 @@ class _VendorWidgetState extends State<VendorWidget> {
                       ),
                     ),
                   ),
-                  Padding(
-                    padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
-                    child: Container(
-                      alignment: Alignment.topLeft,
-                      width: 100, // Set the button width
-                      child: ElevatedButton(
-                        onPressed: () {
-                          debugPrint("Filter Button Clicked ");
-                          kIsWeb
-                              ? (_scaffoldKey.currentState!.isDrawerOpen
-                                      ? Navigator.of(context)
-                                          .pop() // Close the drawer
-                                      : _scaffoldKey.currentState!
-                                          .openDrawer() // Open the drawer
-                                  )
-                              : _openFilterModal();
-                        },
-                        style: ElevatedButton.styleFrom(
-                          // backgroundColor: Colors.blue,
-                          foregroundColor: Colors.black,
-                          padding: EdgeInsets.symmetric(
-                              horizontal: 16, vertical: 10),
-                          shape: RoundedRectangleBorder(
-                            borderRadius: BorderRadius.circular(8),
-                            side: BorderSide(
-                              color: Colors.black,
+                  Row(
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                        child: Container(
+                          alignment: Alignment.topLeft,
+                          width: 100, // Set the button width
+                          child: ElevatedButton(
+                            onPressed: () {
+                              debugPrint("Filter Button Clicked ");
+                              kIsWeb
+                                  ? (_scaffoldKey.currentState!.isDrawerOpen
+                                          ? Navigator.of(context)
+                                              .pop() // Close the drawer
+                                          : _scaffoldKey.currentState!
+                                              .openDrawer() // Open the drawer
+                                      )
+                                  : _openFilterModal();
+                            },
+                            style: ElevatedButton.styleFrom(
+                              // backgroundColor: Colors.blue,
+                              foregroundColor: Colors.black,
+                              padding: EdgeInsets.symmetric(
+                                  horizontal: 16, vertical: 10),
+                              shape: RoundedRectangleBorder(
+                                borderRadius: BorderRadius.circular(8),
+                                side: BorderSide(
+                                  color: Colors.black,
+                                ),
+                              ),
+                            ),
+                            child: Row(
+                              children: [
+                                Icon(MdiIcons.tuneVariant),
+                                // Icon on the left
+                                SizedBox(width: 8),
+                                // Space between icon and text
+                                Text("Filter"),
+                              ],
                             ),
                           ),
                         ),
-                        child: Row(
-                          children: [
-                            Icon(MdiIcons.tuneVariant), // Icon on the left
-                            SizedBox(width: 8), // Space between icon and text
-                            Text("Filter"),
-                          ],
-                        ),
                       ),
-                    ),
+                      _selectedFilter == null
+                          ? Material()
+                          : Padding(
+                              padding:
+                                  const EdgeInsets.only(left: 8.0, bottom: 8.0),
+                              child: Container(
+                                decoration: BoxDecoration(
+                                  border: Border.all(
+                                    color: Colors.black38,
+                                  ),
+                                  borderRadius: BorderRadius.circular(8),
+                                ),
+                                padding: EdgeInsets.all(8),
+                                child: Row(
+                                  mainAxisAlignment:
+                                      MainAxisAlignment.spaceBetween,
+                                  children: [
+                                    GestureDetector(
+                                      onTap: () {
+                                        _selectedFilter = null;
+                                        setState(() {});
+                                      },
+                                      child: Icon(
+                                        Icons.close,
+                                        color: Colors.red, // Set icon color
+                                        // size: 24, // Set icon size
+                                      ),
+                                    ),
+                                    Text(
+                                      _selectedFilter!,
+                                      style: TextStyle(
+                                        fontSize: 16,
+                                        color: Colors.black, // Set text color
+                                      ),
+                                    ),
+                                    _selectedOrder != null
+                                        ? _selectedOrder == 'ASC'
+                                            ? Icon(Icons.arrow_upward)
+                                            : Icon(Icons.arrow_downward)
+                                        : Material(),
+                                  ],
+                                ),
+                              ),
+                            ),
+                    ],
                   ),
                   Expanded(
                     child: FutureBuilder<List<VendorModel>>(
@@ -630,24 +688,23 @@ class _VendorWidgetState extends State<VendorWidget> {
                             snapshot.data!.isEmpty) {
                           return Center(child: Text('No vendors found.'));
                         } else {
-                          // Filter the data based on the search input
                           List<VendorModel> filteredItems = snapshot.data!
                               .where((vendor) => vendor.vendorName
                                   .toLowerCase()
                                   .contains(
                                       searchController.text.toLowerCase()))
                               .toList();
-
                           return Padding(
                             padding: kIsWeb
                                 ? const EdgeInsets.only(bottom: 16)
                                 : const EdgeInsets.only(bottom: 1),
-                            child: SizedBox(
-                              width: screen.width,
-                              child: kIsWeb
-                                  ? Wrap(
-                                      runSpacing: 8.0,
-                                      children: filteredItems.map((vendor) {
+                            child: SingleChildScrollView(
+                              child: SizedBox(
+                                width: screen.width,
+                                child: kIsWeb
+                                    ? Wrap(
+                                        runSpacing: 8.0,
+                                        children: filteredItems.map((vendor) {
                                         return SizedBox(
                                           width: vendorCardWidth,
                                           child: VendorCardWidget(
@@ -658,12 +715,12 @@ class _VendorWidgetState extends State<VendorWidget> {
                                             description: vendor.description,
                                             phone: vendor.phone,
                                             isLogin: _isLogin,
-                                          ),
-                                        );
+                                              vendorId: vendor.vId,
+                                            ),
+                                          );
                                       }).toList(),
                                     )
-                                  : SingleChildScrollView(
-                                      child: Wrap(
+                                    : Wrap(
                                         runSpacing: 8.0,
                                         children: filteredItems.map((vendor) {
                                           return SizedBox(
@@ -676,11 +733,12 @@ class _VendorWidgetState extends State<VendorWidget> {
                                               description: vendor.description,
                                               phone: vendor.phone,
                                               isLogin: _isLogin,
+                                              vendorId: vendor.vId,
                                             ),
                                           );
                                         }).toList(),
                                       ),
-                                    ),
+                              ),
                             ),
                           );
                         }

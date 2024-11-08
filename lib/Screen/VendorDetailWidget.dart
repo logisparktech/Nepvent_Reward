@@ -1,10 +1,13 @@
 import 'package:cached_network_image/cached_network_image.dart';
+import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:nepvent_reward/Model/CustomerInsightsModel.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
 import 'package:nepvent_reward/Screen/LoginDashboardWidget.dart';
 import 'package:nepvent_reward/Screen/LoginWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
+import 'package:nepvent_reward/Utils/Urls.dart';
 
 class VendorDetailWidget extends StatefulWidget {
   const VendorDetailWidget({
@@ -16,6 +19,7 @@ class VendorDetailWidget extends StatefulWidget {
     required this.description,
     required this.phone,
     required this.isLogin,
+    required this.vendorId,
   });
 
   final bool isLogin;
@@ -25,6 +29,7 @@ class VendorDetailWidget extends StatefulWidget {
   final String address;
   final String description;
   final String phone;
+  final String vendorId;
 
   @override
   State<VendorDetailWidget> createState() => _VendorDetailWidgetState();
@@ -33,36 +38,62 @@ class VendorDetailWidget extends StatefulWidget {
 class _VendorDetailWidgetState extends State<VendorDetailWidget> {
   String? profileAvatar;
 
+  // CustomerInsights? customerInsights;
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     _getProfileAvatar();
+    _getCustomerInsights();
   }
 
-  void _onItemTapped(int index) {
-    _navigateToLoginDashboard(index);
-  }
+  // void _onItemTapped(int index) {
+  //   _navigateToLoginDashboard(index);
+  // }
+  //
+  // void _navigateToLoginDashboard(int tabIndex) {
+  //   widget.isLogin
+  //       ? Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => LoginDashboardWidget(
+  //               tabIndex: tabIndex,
+  //               profileUrl: profileAvatar,
+  //             ),
+  //           ),
+  //         )
+  //       : Navigator.push(
+  //           context,
+  //           MaterialPageRoute(
+  //             builder: (context) => DashboardWidget(
+  //               tabIndex: tabIndex,
+  //             ),
+  //           ),
+  //         );
+  // }
+  Future<CustomerInsights?> _getCustomerInsights() async {
+    if (!widget.isLogin) {
+      debugPrint('🙅‍♂️🙅‍♂️🙅‍♂️ User Not Login');
+      return null;
+    }
 
-  void _navigateToLoginDashboard(int tabIndex) {
-    widget.isLogin
-        ? Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => LoginDashboardWidget(
-                tabIndex: tabIndex,
-                profileUrl: profileAvatar,
-              ),
-            ),
-          )
-        : Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => DashboardWidget(
-                tabIndex: tabIndex,
-              ),
-            ),
-          );
+    try {
+      final Response response =
+          await dio.get('${urls['customerInsights']}${widget.vendorId}');
+      final body = response.data['data'];
+      debugPrint('CustomerInsights : $body');
+      return CustomerInsights(
+        totalInvoices: body['totalInvoices'],
+        totalAmount: body['totalAmount'].toString(),
+        totalPoints: body['totalPoints'].toString(),
+        redeemDiscountPoints: body['redeemDiscountPoints'].toString(),
+        totalDiscount: body['totalDiscount'].toString(),
+      );
+    } catch (error) {
+      debugPrint("error in Customer Insights :  $error");
+      return null;
+    }
   }
 
   _getProfileAvatar() async {
@@ -438,293 +469,539 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
               ],
             ),
       body: SafeArea(
-        child: SingleChildScrollView(
-          child: Column(
+        child: SizedBox(
+          height: screen.height,
+          child: Stack(
             children: [
-              SizedBox(
-                width: screen.width,
-                height: 350,
-                child: CachedNetworkImage(
-                  imageUrl: widget.imageUrl,
-                  imageBuilder: (context, imageProvider) => Container(
-                    decoration: BoxDecoration(
-                      image: DecorationImage(
-                        image: imageProvider,
-                        fit: BoxFit.fill,
+              SingleChildScrollView(
+                child: Column(
+                  children: [
+                    SizedBox(
+                      width: screen.width,
+                      height: 350,
+                      child: CachedNetworkImage(
+                        imageUrl: widget.imageUrl,
+                        imageBuilder: (context, imageProvider) => Container(
+                          decoration: BoxDecoration(
+                            image: DecorationImage(
+                              image: imageProvider,
+                              fit: BoxFit.fill,
+                            ),
+                          ),
+                        ),
+                        placeholder: (context, url) => Center(
+                          child: Transform.scale(
+                            scale: 0.8,
+                            child: CircularProgressIndicator(
+                              color: const Color(0xFFDD143D),
+                            ),
+                          ),
+                        ),
+                        errorWidget: (context, url, error) => Icon(Icons.error),
                       ),
                     ),
-                  ),
-                  placeholder: (context, url) => Center(
-                    child: Transform.scale(
-                      scale: 0.8,
-                      child: CircularProgressIndicator(
-                        color: const Color(0xFFDD143D),
+                    Container(
+                      constraints: BoxConstraints(
+                        maxWidth: 1600, // Equivalent to max-width: 1600px
                       ),
-                    ),
-                  ),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
-                ),
-              ),
-              Container(
-                constraints: BoxConstraints(
-                  maxWidth: 1600, // Equivalent to max-width: 1600px
-                ),
-                width: MediaQuery.sizeOf(context)
-                    .width, // Equivalent to width: 100%
-                child: Padding(
-                  padding:
-                      const EdgeInsets.symmetric(horizontal: 16, vertical: 16),
-                  child: Column(
-                    mainAxisAlignment: MainAxisAlignment.start,
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Row(
-                        children: [
-                          SizedBox(
-                            width:kIsWeb? screen.width / 2.5: null,
-                            // height: 105,
-                            child: Column(
-                              mainAxisAlignment: MainAxisAlignment.start,
-                              crossAxisAlignment: CrossAxisAlignment.start,
+                      width: MediaQuery.sizeOf(context)
+                          .width, // Equivalent to width: 100%
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 16, vertical: 16),
+                        child: Column(
+                          mainAxisAlignment: MainAxisAlignment.start,
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
                               children: [
-                                FittedBox(
-                                  child: Row(
-                                    mainAxisAlignment: kIsWeb
-                                        ? MainAxisAlignment.start
-                                        : MainAxisAlignment.spaceBetween,
+                                SizedBox(
+                                  width: kIsWeb ? screen.width / 2.5 : null,
+                                  // height: 105,
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.start,
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.start,
                                     children: [
-                                      Padding(
-                                        padding:
-                                            const EdgeInsets.only(right: 16),
-                                        child: SizedBox(
-                                          width: kIsWeb
-                                              ? null
-                                              : screen.width * 0.67,
-                                          child: Text(
-                                            widget.vendorName,
-                                            overflow: TextOverflow.fade,
-                                            style: TextStyle(
-                                              fontSize: 26,
-                                              fontWeight: FontWeight.w600,
+                                      FittedBox(
+                                        child: Row(
+                                          mainAxisAlignment: kIsWeb
+                                              ? MainAxisAlignment.start
+                                              : MainAxisAlignment.spaceBetween,
+                                          children: [
+                                            Padding(
+                                              padding: const EdgeInsets.only(
+                                                  right: 16),
+                                              child: SizedBox(
+                                                width: kIsWeb
+                                                    ? null
+                                                    : screen.width * 0.67,
+                                                child: Text(
+                                                  widget.vendorName,
+                                                  overflow: TextOverflow.fade,
+                                                  style: TextStyle(
+                                                    fontSize: 26,
+                                                    fontWeight: FontWeight.w600,
+                                                  ),
+                                                ),
+                                              ),
                                             ),
-                                          ),
+                                            kIsWeb
+                                                ? buildContainerForWeb(
+                                                    widget.discount)
+                                                : buildContainerForMobile(
+                                                    widget.discount),
+                                          ],
                                         ),
                                       ),
-                                      kIsWeb
-                                          ? buildContainerForWeb(
-                                              widget.discount)
-                                          : buildContainerForMobile(
-                                              widget.discount),
+                                      Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Icon(
+                                              Icons.location_on_outlined,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Text(
+                                              widget.address,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
+                                      Row(
+                                        children: [
+                                          Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Icon(
+                                              Icons.call,
+                                              color: Colors.grey,
+                                            ),
+                                          ),
+                                          Padding(
+                                            padding: const EdgeInsets.all(4.0),
+                                            child: Text(
+                                              widget.phone,
+                                              style: TextStyle(
+                                                fontSize: 15,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                          ),
+                                        ],
+                                      ),
                                     ],
                                   ),
                                 ),
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Icon(
-                                        Icons.location_on_outlined,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Text(
-                                        widget.address,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
-                                Row(
-                                  children: [
-                                    Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Icon(
-                                        Icons.call,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    Padding(
-                                      padding: const EdgeInsets.all(4.0),
-                                      child: Text(
-                                        widget.phone,
-                                        style: TextStyle(
-                                          fontSize: 15,
-                                          color: Colors.grey,
-                                        ),
-                                      ),
-                                    ),
-                                  ],
-                                ),
+                                widget.isLogin
+                                    ? kIsWeb
+                                        ? Padding(
+                                            padding: const EdgeInsets.only(
+                                                left: 8.0, right: 8.0),
+                                            child: Container(
+                                              width: 1,
+                                              height: 100,
+                                              color: Colors.grey,
+                                            ),
+                                          )
+                                        : Material()
+                                    : Material(),
+                                widget.isLogin
+                                    ? kIsWeb
+                                        ? FutureBuilder<CustomerInsights?>(
+                                            future: _getCustomerInsights(),
+                                            builder: (context, snapshot) {
+                                              if (snapshot.connectionState ==
+                                                  ConnectionState.waiting) {
+                                                return Center(child: CircularProgressIndicator());
+                                              } else if (snapshot.hasError) {
+                                                return Text(
+                                                    'Error: ${snapshot.error}');
+                                              } else if (snapshot.hasData) {
+                                                final insights = snapshot.data!;
+                                                return Row(
+                                                  mainAxisAlignment:
+                                                      MainAxisAlignment.start,
+                                                  crossAxisAlignment:
+                                                      CrossAxisAlignment.center,
+                                                  children: [
+                                                    SizedBox(
+                                                      width: 150,
+                                                      height: 100,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Text(
+                                                              "Total Spending",
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            insights
+                                                                .redeemDiscountPoints,
+                                                            style: TextStyle(
+                                                              fontSize: 24,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: const Color(
+                                                                  0xFFDD143D),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 150,
+                                                      height: 100,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Text(
+                                                              "Points Earned",
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            insights
+                                                                .totalPoints,
+                                                            style: TextStyle(
+                                                              fontSize: 24,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: const Color(
+                                                                  0xFFDD143D),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    SizedBox(
+                                                      width: 150,
+                                                      height: 100,
+                                                      child: Column(
+                                                        mainAxisAlignment:
+                                                            MainAxisAlignment
+                                                                .center,
+                                                        crossAxisAlignment:
+                                                            CrossAxisAlignment
+                                                                .center,
+                                                        children: [
+                                                          Padding(
+                                                            padding:
+                                                                const EdgeInsets
+                                                                    .all(8.0),
+                                                            child: Text(
+                                                              "Discount Claim",
+                                                              style: TextStyle(
+                                                                fontFamily:
+                                                                    'Poppins',
+                                                                fontSize: 16,
+                                                                fontWeight:
+                                                                    FontWeight
+                                                                        .w500,
+                                                              ),
+                                                            ),
+                                                          ),
+                                                          Text(
+                                                            insights
+                                                                .totalDiscount,
+                                                            style: TextStyle(
+                                                              fontSize: 24,
+                                                              fontWeight:
+                                                                  FontWeight
+                                                                      .w700,
+                                                              color: const Color(
+                                                                  0xFFDD143D),
+                                                            ),
+                                                          ),
+                                                        ],
+                                                      ),
+                                                    ),
+                                                    TextButton.icon(
+                                                      onPressed: () {
+                                                        Navigator.push(
+                                                          context,
+                                                          MaterialPageRoute(
+                                                            builder: (context) =>
+                                                                LoginDashboardWidget(
+                                                              profileUrl: '',
+                                                              tabIndex: 3,
+                                                            ),
+                                                          ),
+                                                        );
+                                                      },
+                                                      iconAlignment:
+                                                          IconAlignment.end,
+                                                      label: Text(
+                                                        "Detail",
+                                                        style: TextStyle(
+                                                          fontFamily: 'Poppins',
+                                                          fontSize: 16,
+                                                          fontWeight:
+                                                              FontWeight.w600,
+                                                          color: Colors.black,
+                                                        ),
+                                                      ),
+                                                      icon: Icon(
+                                                        Icons.arrow_forward,
+                                                        color: Colors.black,
+                                                      ),
+                                                    )
+                                                  ],
+                                                );
+                                              }
+                                              return Material(); // Fallback if no data
+                                            },
+                                          )
+                                        : Material()
+                                    : Material(),
                               ],
                             ),
-                          ),
-                          widget.isLogin
-                              ? kIsWeb? Padding(
-                                  padding: const EdgeInsets.only(
-                                      left: 8.0, right: 8.0),
-                                  child: Container(
-                                    width: 1,
-                                    height: 100,
-                                    color: Colors.grey,
-                                  ),
-                                ):Material()
-                              : Material(),
-                          widget.isLogin
-                              ? kIsWeb? Row(
-                                  mainAxisAlignment: MainAxisAlignment.start,
-                                  crossAxisAlignment: CrossAxisAlignment.center,
-                                  children: [
-                                    SizedBox(
-                                      // color: Colors.lightBlue,
-                                      width: 150,
-                                      height: 100,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Total Spending",
-                                              style: TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            "0",
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w700,
-                                              color: const Color(0xFFDD143D),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      // color: Colors.lightBlue,
-                                      width: 150,
-                                      height: 100,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Points Earned",
-                                              style: TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            "0",
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w700,
-                                              color: const Color(0xFFDD143D),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    SizedBox(
-                                      // color: Colors.lightBlue,
-                                      width: 150,
-                                      height: 100,
-                                      child: Column(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.center,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          Padding(
-                                            padding: const EdgeInsets.all(8.0),
-                                            child: Text(
-                                              "Discount Claim",
-                                              style: TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 16,
-                                                fontWeight: FontWeight.w500,
-                                              ),
-                                            ),
-                                          ),
-                                          Text(
-                                            "0",
-                                            style: TextStyle(
-                                              fontSize: 24,
-                                              fontWeight: FontWeight.w700,
-                                              color: const Color(0xFFDD143D),
-                                            ),
-                                          ),
-                                        ],
-                                      ),
-                                    ),
-                                    TextButton.icon(
-                                      onPressed: () {
-                                        Navigator.push(
-                                          context,
-                                          MaterialPageRoute(
-                                            builder: (context) => LoginDashboardWidget(
-                                              profileUrl: '',
-                                              tabIndex: 3,
-                                            ),
-                                          ),
-                                        );
-                                      },
-                                      iconAlignment: IconAlignment.end,
-                                      label: Text(
-                                        "Detail",
-                                        style: TextStyle(
-                                          fontFamily: 'Poppins',
-                                          fontSize: 16,
-                                          fontWeight: FontWeight.w600,
-                                          color: Colors
-                                              .black, // Change the color if needed
-                                        ),
-                                      ),
-                                      icon: Icon(
-                                        Icons.arrow_forward,
-                                        color: Colors
-                                            .black, // Change the color if needed
-                                      ),
-                                    )
-                                  ],
-                                ): Material()
-                              : Material(),
-                        ],
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: Text(
-                          widget.description,
-                          // textAlign: TextAlign.justify,
-                          style: TextStyle(
-                            fontFamily: 'Poppins',
-                            fontSize: 16,
-                            fontWeight: FontWeight.w500,
-                          ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: Text(
+                                widget.description,
+                                // textAlign: TextAlign.justify,
+                                style: TextStyle(
+                                  fontFamily: 'Poppins',
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            )
+                          ],
                         ),
-                      )
-                    ],
-                  ),
+                      ),
+                    )
+                  ],
                 ),
-              )
+              ),
+              widget.isLogin
+                  ? kIsWeb
+                      ? Material()
+                      : Positioned(
+                          left: 8,
+                          right: 8,
+                          bottom: 16,
+                          child: FutureBuilder<CustomerInsights?>(
+                              future: _getCustomerInsights(),
+                              builder: (context, snapshot) {
+                                if (snapshot.connectionState ==
+                                    ConnectionState.waiting) {
+                                  return Center(child: CircularProgressIndicator());
+                                } else if (snapshot.hasError) {
+                                  return Text('Error: ${snapshot.error}');
+                                } else if (snapshot.hasData) {
+                                  final insights = snapshot.data!;
+                                  return Padding(
+                                    padding: const EdgeInsets.only(top: 25.0),
+                                    child: Container(
+                                      decoration: BoxDecoration(
+                                        color: const Color(0xFFDD143D),
+                                        borderRadius: BorderRadius.all(
+                                          Radius.circular(16),
+                                        ),
+                                        boxShadow: [
+                                          BoxShadow(
+                                            color: Colors.grey.withOpacity(0.5),
+                                            spreadRadius: 5,
+                                            blurRadius: 7,
+                                            offset: Offset(0,
+                                                3), // changes position of shadow
+                                          ),
+                                        ],
+                                      ),
+
+                                      // Optional background color
+                                      child: Row(
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.start,
+                                        crossAxisAlignment:
+                                            CrossAxisAlignment.center,
+                                        children: [
+                                          SizedBox(
+                                            // color: Colors.lightBlue,
+                                            width: 100,
+                                            height: 100,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    "Total Spending",
+                                                    style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  insights.totalAmount,
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            // color: Colors.lightBlue,
+                                            width: 100,
+                                            height: 100,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    "Points Earned",
+                                                    style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  insights.totalPoints,
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          SizedBox(
+                                            // color: Colors.lightBlue,
+                                            width: 110,
+                                            height: 100,
+                                            child: Column(
+                                              mainAxisAlignment:
+                                                  MainAxisAlignment.center,
+                                              crossAxisAlignment:
+                                                  CrossAxisAlignment.center,
+                                              children: [
+                                                Padding(
+                                                  padding:
+                                                      const EdgeInsets.all(8.0),
+                                                  child: Text(
+                                                    "Discount Claim",
+                                                    style: TextStyle(
+                                                      fontFamily: 'Poppins',
+                                                      fontSize: 12,
+                                                      fontWeight:
+                                                          FontWeight.w600,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ),
+                                                Text(
+                                                  insights.redeemDiscountPoints,
+                                                  style: TextStyle(
+                                                    fontSize: 24,
+                                                    fontWeight: FontWeight.w700,
+                                                    color: Colors.white,
+                                                  ),
+                                                ),
+                                              ],
+                                            ),
+                                          ),
+                                          TextButton.icon(
+                                            onPressed: () {
+                                              Navigator.push(
+                                                context,
+                                                MaterialPageRoute(
+                                                  builder: (context) =>
+                                                      LoginDashboardWidget(
+                                                    profileUrl: '',
+                                                    tabIndex: 3,
+                                                  ),
+                                                ),
+                                              );
+                                            },
+                                            iconAlignment: IconAlignment.end,
+                                            label: Text(
+                                              "Detail",
+                                              style: TextStyle(
+                                                fontFamily: 'Poppins',
+                                                fontSize: 12,
+                                                fontWeight: FontWeight.w700,
+                                                color: Colors.white,
+                                              ),
+                                            ),
+                                            icon: Icon(
+                                              Icons.arrow_forward,
+                                              color: Colors.white,
+                                              size: 15,
+                                            ),
+                                          )
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                }
+                                return Material();
+                              }),
+                        )
+                  : Material(),
             ],
           ),
         ),

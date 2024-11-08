@@ -9,6 +9,7 @@ class VendorLimitedOfferWidget extends StatelessWidget {
   final String address;
   final String description;
   final String phone;
+  final String vendorId;
   final bool isLogin;
 
   const VendorLimitedOfferWidget({
@@ -20,6 +21,7 @@ class VendorLimitedOfferWidget extends StatelessWidget {
     required this.description,
     required this.phone,
     required this.isLogin,
+    required this.vendorId,
   });
 
   @override
@@ -39,6 +41,7 @@ class VendorLimitedOfferWidget extends StatelessWidget {
                 description: description,
                 phone: phone,
                 isLogin: isLogin,
+                vendorId: vendorId,
               ),
             ),
           );

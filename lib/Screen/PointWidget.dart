@@ -54,13 +54,14 @@ class _PointWidgetState extends State<PointWidget> {
                             context,
                             MaterialPageRoute(
                               builder: (context) => VendorDetailWidget(
-                                discount: -1,
+                                discount: vendor.discount,
                                 vendorName: vendor.vendorName,
                                 imageUrl: vendor.imageUrl,
                                 address: vendor.address,
                                 description: vendor.description,
                                 phone: vendor.phone,
                                 isLogin: true,
+                                vendorId: vendor.vId,
                               ),
                             ),
                           );

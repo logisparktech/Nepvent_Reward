@@ -41,6 +41,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
             vendorName: item['name'],
             location: item['address'],
             description: '', phone: '',
+            vId: '',
           ),
         );
       });
@@ -165,11 +166,12 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                 } else {
                   List<InvoiceModel> filterInvoiceData = [];
                   if (_selectedVendorName != null) {
-                    filterInvoiceData = filterInvoiceData
+                    filterInvoiceData = snapshot.data!
                         .where((element) =>
                             element.vendorName.toLowerCase() ==
                             _selectedVendorName!.toLowerCase())
                         .toList();
+                    debugPrint(' 🎦filterInvoiceData: $filterInvoiceData');
                   } else {
                     filterInvoiceData = snapshot.data!;
                   }
@@ -307,6 +309,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
                     ],
                   ),
                 ),
+                invoice.tableName.isEmpty?Material():
                 Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 8),
                   child: Row(

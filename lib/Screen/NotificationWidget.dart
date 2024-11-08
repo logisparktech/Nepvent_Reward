@@ -108,8 +108,25 @@ class _NotificationWidgetState extends State<NotificationWidget> {
             } else if (snapshot.hasError) {
               return Center(child: Text("Error loading notifications"));
             } else {
-              return ListView.builder(
-                itemCount: notificationModel.length,
+              return notificationModel.isEmpty
+                  ? Center(
+                      child: Column(
+                        children: [
+                          Icon(
+                            Icons.error_sharp,
+                            color: Color(0xFFDD143D),
+                          ),
+                          Text(
+                            "No Notification found",
+                            style: TextStyle(
+                              color: Color(0xFFDD143D),
+                            ),
+                          )
+                        ],
+                      ),
+                    )
+                  : ListView.builder(
+                      itemCount: notificationModel.length,
                 itemBuilder: (context, index) {
                   final notification = notificationModel[index];
                   final bool isSeen =

@@ -198,6 +198,30 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                         debugPrint('Notification Value: $value');
                       },
                       itemBuilder: (BuildContext context) {
+                        if (notificationModel.isEmpty) {
+                          return [
+                            PopupMenuItem<String>(
+                              enabled: false, // Makes the item non-interactive
+                              child:Center(
+                                child: Column(
+                                  children: [
+                                    Icon(
+                                      Icons.error_sharp,
+                                      color: Color(0xFFDD143D),
+                                    ),
+                                    Text(
+                                      "No Notification found",
+                                      style: TextStyle(
+                                        color: Color(0xFFDD143D),
+                                      ),
+                                    )
+                                  ],
+                                ),
+                              ),
+                            ),
+                          ];
+                        }
+                        else{
                         return notificationModel.map((notification) {
                           final bool isSeen =
                               notification.viewedUser.contains(currentUserId);
@@ -259,6 +283,7 @@ class _LoginDashboardWidgetState extends State<LoginDashboardWidget> {
                             ),
                           );
                         }).toList();
+                        }
                       },
                       child: Icon(
                         MdiIcons.bell,

@@ -10,6 +10,7 @@ class VendorCardWidget extends StatelessWidget {
   final String description;
   final String phone;
   final bool isLogin;
+  final String vendorId;
 
   const VendorCardWidget({
     super.key,
@@ -20,6 +21,7 @@ class VendorCardWidget extends StatelessWidget {
     required this.description,
     required this.phone,
     required this.isLogin,
+    required this.vendorId,
   });
 
   @override
@@ -39,6 +41,7 @@ class VendorCardWidget extends StatelessWidget {
                 description: description,
                 phone: phone,
                 isLogin: isLogin,
+                vendorId: vendorId,
               ),
             ),
           );

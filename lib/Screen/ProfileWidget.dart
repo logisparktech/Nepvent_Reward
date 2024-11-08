@@ -70,6 +70,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
               description: vendor['description'],
               phone: vendor['phone'],
               imageUrl: 'https://rms.nepvent.com/assets/nepvent-default-banner.69b2a990.png',
+              discount: vendor['discount'] ?? -2,
             ),
           );
 

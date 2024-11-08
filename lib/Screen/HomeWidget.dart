@@ -107,6 +107,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             location: item['address'],
             description: item['description'],
             phone: item['phone'],
+            vId: '',
           ),
         );
       });
@@ -136,6 +137,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             location: item['address'],
             description: item['description'],
             phone: item['phone'],
+            vId: '',
           ),
         );
       });
@@ -282,6 +284,9 @@ class _HomeWidgetState extends State<HomeWidget> {
                                             phone:
                                                 limitedVendorData[index].phone,
                                             isLogin: _isLogin,
+                                            vendorId: _isLogin
+                                                ? limitedVendorData[index].vId
+                                                : '',
                                           ),
                                         );
                                       },
@@ -409,6 +414,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                                               description: vendor.description,
                                               phone: vendor.phone,
                                               isLogin: _isLogin,
+                                              vendorId: vendor.vId,
                                             ),
                                           );
                                         }).toList(),

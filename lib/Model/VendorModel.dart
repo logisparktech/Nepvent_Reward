@@ -1,4 +1,5 @@
 class VendorModel {
+  final String vId;
   final int discount;
   final String imageUrl;
   final String vendorName;
@@ -7,6 +8,7 @@ class VendorModel {
   final String phone;
 
   VendorModel({
+    required this.vId,
     required this.discount,
     required this.imageUrl,
     required this.vendorName,
