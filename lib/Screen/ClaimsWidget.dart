@@ -37,7 +37,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
         newVendorData.add(
           VendorModel(
             imageUrl: "",
-            discount: item['discount'],
+            discount: item['discount'].toInt(),
             vendorName: item['name'],
             location: item['address'],
             description: '', phone: '',
@@ -49,7 +49,7 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
         vendorName = newVendorData;
       });
     } catch (e) {
-      print("Error Fetching  vendor data: $e");
+      print("Error Fetching vendor data: $e");
     }
   }
 
@@ -63,9 +63,9 @@ class _ClaimsWidgetState extends State<ClaimsWidget> {
           InvoiceModel(
             vendorName: invoice['vendor']['name'],
             tableName: invoice['tableName']??'',
-            discount: invoice['discountPercent'],
+            discount: invoice['discountPercent'].toInt(),
             invoiceNumber: invoice['invoiceNumber'],
-            finalAmount: invoice['finalAmount'],
+            finalAmount: invoice['finalAmount'].toInt(),
           ),
         );
       }

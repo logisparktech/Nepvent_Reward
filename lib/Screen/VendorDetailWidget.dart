@@ -37,6 +37,7 @@ class VendorDetailWidget extends StatefulWidget {
 
 class _VendorDetailWidgetState extends State<VendorDetailWidget> {
   String? profileAvatar;
+  CustomerInsights? insights;
 
   // CustomerInsights? customerInsights;
 
@@ -72,34 +73,37 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
   //           ),
   //         );
   // }
+
   Future<CustomerInsights?> _getCustomerInsights() async {
     if (!widget.isLogin) {
       debugPrint('🙅‍♂️🙅‍♂️🙅‍♂️ User Not Login');
       return null;
+    }else {
+      try {
+        final Response response =
+        await dio.get('${urls['customerInsights']}${widget.vendorId}');
+        final body = response.data['data'];
+        debugPrint('vendor Id : ${widget.vendorId}');
+        debugPrint('CustomerInsights : $body');
+        // insights.clear();
+        final insights = CustomerInsights(
+          totalInvoices: body['totalInvoices'],
+          totalAmount: body['totalAmount'].toString(),
+          totalPoints: body['totalPoints'].toString(),
+          redeemDiscountPoints: body['redeemDiscountPoints'].toString(),
+          totalDiscount: body['totalDiscount'].toString(),
+        );
+        return insights;
+      } catch (error) {
+        debugPrint("error in Customer Insights :  $error");
+        return null;
+      }
     }
 
-    try {
-      final Response response =
-          await dio.get('${urls['customerInsights']}${widget.vendorId}');
-      final body = response.data['data'];
-      debugPrint('CustomerInsights : $body');
-      return CustomerInsights(
-        totalInvoices: body['totalInvoices'],
-        totalAmount: body['totalAmount'].toString(),
-        totalPoints: body['totalPoints'].toString(),
-        redeemDiscountPoints: body['redeemDiscountPoints'].toString(),
-        totalDiscount: body['totalDiscount'].toString(),
-      );
-    } catch (error) {
-      debugPrint("error in Customer Insights :  $error");
-      return null;
-    }
   }
 
   _getProfileAvatar() async {
     var profilePic = await secureStorage.read(key: 'ProfilePic') ?? '';
-    // debugPrint('check check ******** $profilePic');
-
     setState(() {
       profileAvatar = profilePic;
     });
@@ -128,7 +132,7 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                         ),
                       ],
                     )
-                  : Text('Vendor'),
+                  : Text('Vendor Details'),
               actions: [
                 Padding(
                   padding: const EdgeInsets.only(right: 24),
@@ -560,7 +564,7 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                             padding: const EdgeInsets.all(4.0),
                                             child: Icon(
                                               Icons.location_on_outlined,
-                                              color: Colors.grey,
+                                              color: Colors.grey[600],
                                             ),
                                           ),
                                           Padding(
@@ -569,7 +573,7 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                               widget.address,
                                               style: TextStyle(
                                                 fontSize: 15,
-                                                color: Colors.grey,
+                                                color: Colors.grey[600],
                                               ),
                                             ),
                                           ),
@@ -581,7 +585,7 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                             padding: const EdgeInsets.all(4.0),
                                             child: Icon(
                                               Icons.call,
-                                              color: Colors.grey,
+                                              color: Colors.grey[600],
                                             ),
                                           ),
                                           Padding(
@@ -590,7 +594,7 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                               widget.phone,
                                               style: TextStyle(
                                                 fontSize: 15,
-                                                color: Colors.grey,
+                                                color: Colors.grey[600],
                                               ),
                                             ),
                                           ),
@@ -619,7 +623,13 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                             builder: (context, snapshot) {
                                               if (snapshot.connectionState ==
                                                   ConnectionState.waiting) {
-                                                return Center(child: CircularProgressIndicator());
+                                                return Center(
+                                                  child:
+                                                      CircularProgressIndicator(
+                                                    color:
+                                                        const Color(0xFFDD143D),
+                                                  ),
+                                                );
                                               } else if (snapshot.hasError) {
                                                 return Text(
                                                     'Error: ${snapshot.error}');
@@ -798,12 +808,14 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                               ],
                             ),
                             Padding(
-                              padding: const EdgeInsets.only(top: 16.0),
+                              padding:
+                                  const EdgeInsets.only(top: 16.0, bottom: 130),
                               child: Text(
                                 widget.description,
                                 // textAlign: TextAlign.justify,
                                 style: TextStyle(
                                   fontFamily: 'Poppins',
+                                  color: Color(0xFF2D2D2D),
                                   fontSize: 16,
                                   fontWeight: FontWeight.w500,
                                 ),
@@ -835,165 +847,174 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                   final insights = snapshot.data!;
                                   return Padding(
                                     padding: const EdgeInsets.only(top: 25.0),
-                                    child: Container(
-                                      decoration: BoxDecoration(
-                                        color: const Color(0xFFDD143D),
-                                        borderRadius: BorderRadius.all(
-                                          Radius.circular(16),
+                                    child: FittedBox(
+                                      child: Container(
+                                        decoration: BoxDecoration(
+                                          color: const Color(0xFFDD143D),
+                                          borderRadius: BorderRadius.all(
+                                            Radius.circular(16),
+                                          ),
+                                          boxShadow: [
+                                            BoxShadow(
+                                              color:
+                                                  Colors.grey.withOpacity(0.5),
+                                              spreadRadius: 5,
+                                              blurRadius: 7,
+                                              offset: Offset(0,
+                                                  3), // changes position of shadow
+                                            ),
+                                          ],
                                         ),
-                                        boxShadow: [
-                                          BoxShadow(
-                                            color: Colors.grey.withOpacity(0.5),
-                                            spreadRadius: 5,
-                                            blurRadius: 7,
-                                            offset: Offset(0,
-                                                3), // changes position of shadow
-                                          ),
-                                        ],
-                                      ),
-
-                                      // Optional background color
-                                      child: Row(
-                                        mainAxisAlignment:
-                                            MainAxisAlignment.start,
-                                        crossAxisAlignment:
-                                            CrossAxisAlignment.center,
-                                        children: [
-                                          SizedBox(
-                                            // color: Colors.lightBlue,
-                                            width: 100,
-                                            height: 100,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    "Total Spending",
+                                        // Optional background color
+                                        child: Row(
+                                          mainAxisAlignment:
+                                              MainAxisAlignment.start,
+                                          crossAxisAlignment:
+                                              CrossAxisAlignment.center,
+                                          children: [
+                                            SizedBox(
+                                              // color: Colors.lightBlue,
+                                              width: 100,
+                                              height: 100,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      "Total Spending",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    insights.totalAmount,
                                                     style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontSize: 12,
+                                                      fontSize: 24,
                                                       fontWeight:
-                                                          FontWeight.w600,
+                                                          FontWeight.w700,
                                                       color: Colors.white,
                                                     ),
                                                   ),
-                                                ),
-                                                Text(
-                                                  insights.totalAmount,
-                                                  style: TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            // color: Colors.lightBlue,
-                                            width: 100,
-                                            height: 100,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    "Points Earned",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  insights.totalPoints,
-                                                  style: TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          SizedBox(
-                                            // color: Colors.lightBlue,
-                                            width: 110,
-                                            height: 100,
-                                            child: Column(
-                                              mainAxisAlignment:
-                                                  MainAxisAlignment.center,
-                                              crossAxisAlignment:
-                                                  CrossAxisAlignment.center,
-                                              children: [
-                                                Padding(
-                                                  padding:
-                                                      const EdgeInsets.all(8.0),
-                                                  child: Text(
-                                                    "Discount Claim",
-                                                    style: TextStyle(
-                                                      fontFamily: 'Poppins',
-                                                      fontSize: 12,
-                                                      fontWeight:
-                                                          FontWeight.w600,
-                                                      color: Colors.white,
-                                                    ),
-                                                  ),
-                                                ),
-                                                Text(
-                                                  insights.redeemDiscountPoints,
-                                                  style: TextStyle(
-                                                    fontSize: 24,
-                                                    fontWeight: FontWeight.w700,
-                                                    color: Colors.white,
-                                                  ),
-                                                ),
-                                              ],
-                                            ),
-                                          ),
-                                          TextButton.icon(
-                                            onPressed: () {
-                                              Navigator.push(
-                                                context,
-                                                MaterialPageRoute(
-                                                  builder: (context) =>
-                                                      LoginDashboardWidget(
-                                                    profileUrl: '',
-                                                    tabIndex: 3,
-                                                  ),
-                                                ),
-                                              );
-                                            },
-                                            iconAlignment: IconAlignment.end,
-                                            label: Text(
-                                              "Detail",
-                                              style: TextStyle(
-                                                fontFamily: 'Poppins',
-                                                fontSize: 12,
-                                                fontWeight: FontWeight.w700,
-                                                color: Colors.white,
+                                                ],
                                               ),
                                             ),
-                                            icon: Icon(
-                                              Icons.arrow_forward,
-                                              color: Colors.white,
-                                              size: 15,
+                                            SizedBox(
+                                              // color: Colors.lightBlue,
+                                              width: 100,
+                                              height: 100,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      "Points Earned",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    insights.totalPoints,
+                                                    style: TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
                                             ),
-                                          )
-                                        ],
+                                            SizedBox(
+                                              // color: Colors.lightBlue,
+                                              width: 110,
+                                              height: 100,
+                                              child: Column(
+                                                mainAxisAlignment:
+                                                    MainAxisAlignment.center,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.center,
+                                                children: [
+                                                  Padding(
+                                                    padding:
+                                                        const EdgeInsets.all(
+                                                            8.0),
+                                                    child: Text(
+                                                      "Discount Claim",
+                                                      style: TextStyle(
+                                                        fontFamily: 'Poppins',
+                                                        fontSize: 12,
+                                                        fontWeight:
+                                                            FontWeight.w600,
+                                                        color: Colors.white,
+                                                      ),
+                                                    ),
+                                                  ),
+                                                  Text(
+                                                    insights
+                                                        .redeemDiscountPoints,
+                                                    style: TextStyle(
+                                                      fontSize: 24,
+                                                      fontWeight:
+                                                          FontWeight.w700,
+                                                      color: Colors.white,
+                                                    ),
+                                                  ),
+                                                ],
+                                              ),
+                                            ),
+                                            TextButton.icon(
+                                              onPressed: () {
+                                                Navigator.push(
+                                                  context,
+                                                  MaterialPageRoute(
+                                                    builder: (context) =>
+                                                        LoginDashboardWidget(
+                                                      profileUrl: '',
+                                                      tabIndex: 3,
+                                                    ),
+                                                  ),
+                                                );
+                                              },
+                                              iconAlignment: IconAlignment.end,
+                                              label: Text(
+                                                "Detail",
+                                                style: TextStyle(
+                                                  fontFamily: 'Poppins',
+                                                  fontSize: 12,
+                                                  fontWeight: FontWeight.w700,
+                                                  color: Colors.white,
+                                                ),
+                                              ),
+                                              icon: Icon(
+                                                Icons.arrow_forward,
+                                                color: Colors.white,
+                                                size: 15,
+                                              ),
+                                            )
+                                          ],
+                                        ),
                                       ),
                                     ),
                                   );

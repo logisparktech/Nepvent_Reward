@@ -364,7 +364,7 @@ class _HomeWidgetState extends State<HomeWidget> {
                             padding: const EdgeInsets.only(top: 16.0),
                             child: SizedBox(
                               height: isMobile
-                                  ? cardHeight * vendorData.length / 3.2
+                                  ? cardHeight * vendorData.length / 2.9
                                   : cardHeight * vendorData.length / 2.3,
                               child: Column(
                                 mainAxisAlignment: MainAxisAlignment.start,

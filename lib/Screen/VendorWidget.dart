@@ -66,7 +66,7 @@ class _VendorWidgetState extends State<VendorWidget> {
             ? item['assets'][0]['url']
             : 'https://images.pexels.com/photos/1639556/pexels-photo-1639556.jpeg?auto=compress&cs=tinysrgb&w=600'; // Default image URL
 
-        // debugPrint("Vendor Id 🪪🪪🪪: ${item['_id']}");
+        debugPrint("Vendor Id 🪪🪪🪪: ${item['_id']}");
         newVendorData.add(
           VendorModel(
             imageUrl: imageUrl,
@@ -706,6 +706,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                                     ? Wrap(
                                         runSpacing: 8.0,
                                         children: filteredItems.map((vendor) {
+
                                         return SizedBox(
                                           width: vendorCardWidth,
                                           child: VendorCardWidget(
@@ -724,6 +725,7 @@ class _VendorWidgetState extends State<VendorWidget> {
                                     : Wrap(
                                         runSpacing: 8.0,
                                         children: filteredItems.map((vendor) {
+                                          debugPrint("Vendor Id 🆔🆔: ${vendor.vId}");
                                           return SizedBox(
                                             width: vendorCardWidth,
                                             child: VendorCardWidget(

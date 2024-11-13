@@ -146,6 +146,7 @@ class _LoginWidgetState extends State<LoginWidget> {
               child: Image.asset(
                 'assets/images/top-view.jpg',
                 fit: BoxFit.cover,
+                width: screen.width,
                 height: 300,
               ),
             ),

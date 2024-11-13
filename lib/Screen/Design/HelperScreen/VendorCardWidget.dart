@@ -30,6 +30,7 @@ class VendorCardWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: InkWell(
         onTap: () {
+          debugPrint("Vendor Id 🆔🆔: $vendorId");
           Navigator.push(
             context,
             MaterialPageRoute(

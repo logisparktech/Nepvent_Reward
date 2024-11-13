@@ -50,34 +50,28 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
       var vendorLoyaltyPoints = body['vendorLoyaltyPoints'] as List;
       // List<VendorDetailModel> vendorDetails = [];
-
+      vendorDetailModel.clear();
       for (var pointData in vendorLoyaltyPoints) {
+
         if (pointData is Map &&
             pointData.containsKey('points') &&
             pointData.containsKey('vendor')) {
           final vendor = pointData['vendor'] as Map;
-          final vendorName = vendor['name'] as String;
-          final vId = vendor['_id'] as String;
-          final points = pointData['points'] as int;
 
-          vendorDetailModel.clear();
           vendorDetailModel.add(
             VendorDetailModel(
-              vendorName: vendorName,
-              points: points,
-              vId: vId,
+              vendorName: vendor['name'],
+              points:  pointData['points'],
+              vId:  vendor['_id'],
               address: vendor['address'],
               description: vendor['description'],
               phone: vendor['phone'],
-              imageUrl: 'https://rms.nepvent.com/assets/nepvent-default-banner.69b2a990.png',
+              imageUrl: vendor['assets'].isNotEmpty ? vendor['assets'][0]['url'] : ''  ,
               discount: vendor['discount'] ?? -2,
             ),
           );
 
-          // setState(() {
-          //   vendorDetailModel = vendorDetails;
-          // });
-          debugPrint('Vendor Detail : $vendorDetailModel');
+          debugPrint('Vendor Detail : ${vendorDetailModel.length}');
         }
       }
 
@@ -113,6 +107,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       print("Error Fetching Profile data: $e");
       return null; // Return null in case of error
     }
+    return null;
   }
 
   _updateUser() async {
@@ -372,7 +367,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
                                 vertical: 15), // Padding to enlarge the button
                           ),
                           child: Text(
-                            'show Points',
+                            'Show Points',
                             style: TextStyle(
                               color: Colors.white, // Text color
                               fontSize: 16, // Font size
