@@ -37,10 +37,10 @@ class SocketService {
       socket.on(
           'notification',
               (data) {
-
+                // print('Data :  $data');
                 final String title = data['title'];
                 final String content = data['content'];
-                final String imageUrl = data['picture'][0]['url'];
+                final String imageUrl = (data['picture'] != null && data['picture'].isNotEmpty)?data['picture'][0]['url']:'' ;
                 final String date = data['date'];
             print('Data :  $data');
             if (kIsWeb) {

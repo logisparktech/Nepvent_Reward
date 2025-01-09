@@ -30,7 +30,7 @@ class VendorCardWidget extends StatelessWidget {
       padding: const EdgeInsets.symmetric(horizontal: 8.0),
       child: InkWell(
         onTap: () {
-          debugPrint("Vendor Id 🆔🆔: $vendorId");
+          debugPrint("Vendor Id 🆔🆔 2 : $vendorId");
           Navigator.push(
             context,
             MaterialPageRoute(
@@ -76,7 +76,12 @@ class VendorCardWidget extends StatelessWidget {
                           ),
                         ),
                       ),
-                      errorWidget: (context, url, error) => Icon(Icons.error),
+                      errorWidget: (context, url, error) =>    Image.asset(
+                        'assets/icon/icon.jpg',
+                        // width: 80,
+                        // height: 80,
+                        fit: BoxFit.cover,
+                      ),
                     ),
                   ),
                 ),
@@ -92,7 +97,8 @@ class VendorCardWidget extends StatelessWidget {
                       borderRadius: BorderRadius.circular(8),
                     ),
                     child: Text(
-                      discount == -1 ? 'FREE' : '$discount% OFF',
+                      discount == -1 ? 'FREE Items' : '$discount% OFF',
+                      textAlign: TextAlign.center,
                       style: const TextStyle(
                         color: Colors.white,
                         fontWeight: FontWeight.bold,

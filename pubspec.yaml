@@ -5,7 +5,7 @@ description: "This Project is called Nepvent Reward."
 publish_to: 'none'
 
 # Versioning details for the application
-version: 1.0.0+1
+version: 1.0.1+1
 
 environment:
   sdk: ^3.5.1
@@ -30,6 +30,8 @@ dependencies:
   shared_preferences: ^2.3.2
   material_design_icons_flutter: ^7.0.7296
   flutter_background_service: ^5.0.10
+  dropdown_search: ^6.0.1
+  intl: ^0.19.0
 
 dev_dependencies:
   flutter_test:
@@ -50,11 +52,11 @@ flutter:
 flutter_launcher_icons:
   android: "launcher_icon"
   ios: true
-  image_path: "assets/icon/icon.png"
+  image_path: "assets/icon/AppLogo.png"
   min_sdk_android: 21 # android min sdk min:16, default 21
   web:
     generate: true
-    image_path: "assets/icon/icon.png"
+    image_path: "assets/icon/AppLogo.png"
     background_color: "#hexcode"
     theme_color: "#hexcode"
 

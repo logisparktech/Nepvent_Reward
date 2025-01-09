@@ -21,12 +21,12 @@ class ProfileWidget extends StatefulWidget {
 
 class _ProfileWidgetState extends State<ProfileWidget> {
   bool isEditable = false;
-  ProfileModel? user;
   final ImagePicker _picker = ImagePicker();
   File? _imageFile;
   Uint8List webImage = Uint8List(8);
   String? _selectedProvince;
   String? _selectedDistrict;
+  List<ProfileModel> profileData = [];
 
   // Controllers for the form fields
   final TextEditingController addressController = TextEditingController();
@@ -37,9 +37,10 @@ class _ProfileWidgetState extends State<ProfileWidget> {
   void initState() {
     // TODO: implement initState
     super.initState();
+    _fetchProfileData();
   }
 
-  Future<ProfileModel?> _fetchProfileData() async {
+  _fetchProfileData() async {
     String userID = await secureStorage.read(key: 'userID') ?? '';
     String profilePic = '';
     debugPrint(' ***** UserId 🆔 *** : $userID ');
@@ -78,29 +79,39 @@ class _ProfileWidgetState extends State<ProfileWidget> {
       if (body['displayPicture']?.containsKey('url') == true) {
         profilePic = body['displayPicture']['url'].toString();
       }
-      // Create ProfileModel instance
-      ProfileModel profileData = ProfileModel(
+      List<ProfileModel> newProfileData = [];
+
+      newProfileData.add(ProfileModel(
         id: body['_id'],
         name: body['name'],
         email: body['email'],
         phone: body['phone'],
-        district: body['userDetail']['district'] ?? '',
-        address: body['userDetail']['address']??'',
-        province: body['userDetail']['province'] ?? '',
-        secondaryNumber: body['userDetail']['secondaryNumber']?? '',
+        district: body.containsKey('userDetail')
+            ? body['userDetail']['district']
+            : '',
+        address:
+            body.containsKey('userDetail') ? body['userDetail']['address'] : '',
+        province: body.containsKey('userDetail')
+            ? body['userDetail']['province']
+            : '',
+        secondaryNumber: body.containsKey('userDetail')
+            ? body['userDetail']['secondaryNumber']
+            : '',
         avatarUrl: profilePic,
         memberId: body['membershipId'],
-      );
+      ));
 
-
-      // Set the address controller text
-      addressController.text = profileData.address;
-      _selectedDistrict = profileData.district;
-      _selectedProvince = profileData.province;
-      secondaryNumberController.text = profileData.secondaryNumber;
-
-      return profileData;
-
+      setState(() {
+        profileData = newProfileData;
+        addressController.text = profileData.first.address;
+        _selectedDistrict = profileData.first.district.isEmpty
+            ? null
+            : profileData.first.district;
+        _selectedProvince = profileData.first.province.isEmpty
+            ? null
+            : profileData.first.province;
+        secondaryNumberController.text = profileData.first.secondaryNumber;
+      });
     } on DioException catch(err){
       print("Error Fetching Profile data: $err");
     } catch (e) {
@@ -118,8 +129,8 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         data: {
           "userDetail": {
             "address": addressController.text.trim(),
-            "province": _selectedProvince,
-            "district":_selectedDistrict,
+            "province": _selectedProvince ?? '',
+            "district":_selectedDistrict ?? '',
             "secondaryNumber": secondaryNumberController.text.trim(),
           },
         },
@@ -194,7 +205,7 @@ class _ProfileWidgetState extends State<ProfileWidget> {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
             backgroundColor: Color(0xFFD50032),
-            content: Text(response.statusMessage.toString()),
+            content: Text('Profile Picture Updated Successfully.'),
           ),
         );
       } else {
@@ -228,700 +239,687 @@ class _ProfileWidgetState extends State<ProfileWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.white,
-      body: SafeArea(
-        child: FutureBuilder<ProfileModel?>(
-          future: _fetchProfileData(), // Call the future method
-          builder:
-              (BuildContext context, AsyncSnapshot<ProfileModel?> snapshot) {
-            if (snapshot.connectionState == ConnectionState.waiting) {
-              // While the future is loading
-              return Center(
-                child:  CircularProgressIndicator(
-                  color: const Color(0xFFDD143D),
-                ),
-              );
-            } else if (snapshot.hasError) {
-              // If there is an error
-              return Center(child: Text('Error: ${snapshot.error}'));
-            } else if (!snapshot.hasData || snapshot.data == null) {
-              // If no data is returned
-              return Center(child: Text('No Profile Data Available'));
-            } else {
-              // If the data is successfully fetched
-              user = snapshot.data;
-              return SingleChildScrollView(
-                child: Center(
-                  child: Column(
-                    // mainAxisAlignment: MainAxisAlignment.center,
-                    crossAxisAlignment: CrossAxisAlignment.center,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.only(top: 16.0),
-                        child: Stack(
-                          alignment: Alignment.center,
-                          children: [
-                            Container(
-                              width: 200,
-                              height: 150,
-                              decoration: BoxDecoration(
-                                shape: BoxShape.circle,
-                                border: Border.all(
-                                  color: Colors.red,
-                                  width: 2,
-                                  style: BorderStyle.solid,
-                                ),
-                              ),
-                              child: Padding(
-                                padding: const EdgeInsets.all(4.0),
-                                child: CircleAvatar(
-                                  backgroundImage: _imageFile != null
-                                      ? (kIsWeb
-                                          ? MemoryImage(webImage)
-                                              as ImageProvider
-                                          : FileImage(_imageFile!)
-                                              as ImageProvider)
-                                      : user != null &&
-                                              user!.avatarUrl != null &&
-                                              user!.avatarUrl.isNotEmpty
-                                          ? NetworkImage(user!.avatarUrl)
-                                          : AssetImage(
-                                              'assets/images/man-avatar-profile.jpeg'),
-                                  onBackgroundImageError:
-                                      (exception, stackTrace) {
-                                    print(
-                                        'Failed to load network image: $exception');
-                                  },
-                                ),
-                              ),
-                            ),
-                            Positioned(
-                              right: 15,
-                              bottom: 10,
-                              child: Container(
+    return PopScope(
+      canPop: false,
+      child: Scaffold(
+        backgroundColor: Colors.white,
+        body: SafeArea(
+          child: profileData.isEmpty
+              ? Center(
+                  child: CircularProgressIndicator(
+                    color: const Color(0xFFDD143D),
+                  ),
+                )
+              : SingleChildScrollView(
+                  child: Center(
+                    child: Column(
+                      // mainAxisAlignment: MainAxisAlignment.center,
+                      crossAxisAlignment: CrossAxisAlignment.center,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.only(top: 16.0),
+                          child: Stack(
+                            alignment: Alignment.center,
+                            children: [
+                              Container(
+                                width: 200,
+                                height: 150,
                                 decoration: BoxDecoration(
-                                  color: Color(0xFFDD143D),
                                   shape: BoxShape.circle,
-                                ),
-                                child: IconButton(
-                                  icon: Icon(
-                                    Icons.camera_alt_outlined,
+                                  border: Border.all(
+                                    color: Colors.red,
+                                    width: 2,
+                                    style: BorderStyle.solid,
                                   ),
-                                  color: Colors.white, // Icon color
-                                  onPressed: () async {
-                                    if (kIsWeb) {
-                                      XFile? image = await _picker.pickImage(
-                                          source: ImageSource.gallery);
-                                      if (image != null) {
-                                        _updateProfilePicture(image);
-                                        var webImg = await image.readAsBytes();
-
-                                        setState(() {
-                                          webImage = webImg;
-                                          _imageFile = File('a');
-                                        });
-                                      } else {
-                                        debugPrint("No image Selected");
-                                      }
-                                    } else {
-                                      XFile? image = await _picker.pickImage(
-                                          source: ImageSource.gallery);
-                                      if (image != null) {
-                                        _updateProfilePicture(image);
-                                        var selected = File(image.path);
-                                        setState(() {
-                                          _imageFile = selected;
-                                        });
-                                      } else {
-                                        debugPrint("No image Selected");
-                                      }
-                                    }
-                                  },
+                                ),
+                                child: Padding(
+                                  padding: const EdgeInsets.all(4.0),
+                                  child: CircleAvatar(
+                                    backgroundImage: _imageFile != null
+                                        ? (kIsWeb
+                                            ? MemoryImage(webImage)
+                                                as ImageProvider
+                                            : FileImage(_imageFile!)
+                                                as ImageProvider)
+                                        : profileData != null &&
+                                                profileData.first.avatarUrl !=
+                                                    null &&
+                                                profileData
+                                                    .first.avatarUrl.isNotEmpty
+                                            ? NetworkImage(
+                                                profileData.first.avatarUrl)
+                                            : AssetImage(
+                                                'assets/images/man-avatar-profile.jpeg'),
+                                    onBackgroundImageError:
+                                        (exception, stackTrace) {
+                                      print(
+                                          'Failed to load network image: $exception');
+                                    },
+                                  ),
                                 ),
                               ),
-                            ),
-                          ],
-                        ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: ElevatedButton(
-                          onPressed: () {
-                            Navigator.push(
-                              context,
-                              MaterialPageRoute(
-                                builder: (context) => PointWidget(),
-                              ),
-                            );
-                          },
-                          style: ElevatedButton.styleFrom(
-                            backgroundColor: const Color(0xFFDD143D),
-                            // Button color
-                            shape: RoundedRectangleBorder(
-                              borderRadius:
-                                  BorderRadius.circular(10), // Rounded edges
-                            ),
-                            padding: EdgeInsets.symmetric(
-                                horizontal: 50,
-                                vertical: 15), // Padding to enlarge the button
-                          ),
-                          child: Text(
-                            'Show Points',
-                            style: TextStyle(
-                              color: Colors.white, // Text color
-                              fontSize: 16, // Font size
-                              fontWeight: FontWeight.bold, // Bold text
-                            ),
-                          ),
-                        ),
-                        // Container(
-                        //   decoration: BoxDecoration(
-                        //     // color: Colors.greenAccent,
-                        //     border: Border.all(
-                        //       color: Color(0xFFD2D7DE),
-                        //     ),
-                        //     borderRadius: BorderRadius.circular(8),
-                        //   ),
-                        //   child: Padding(
-                        //     padding: const EdgeInsets.only(
-                        //         top: 16.0, left: 12, bottom: 16),
-                        //     child: Column(
-                        //       crossAxisAlignment: CrossAxisAlignment.start,
-                        //       children: [
-                        //         Text(
-                        //           user!.point.toString(),
-                        //           // "350",
-                        //           style: TextStyle(
-                        //             color: const Color(0xFFDD143D),
-                        //             fontSize: 32,
-                        //             fontWeight: FontWeight.w600,
-                        //           ),
-                        //         ),
-                        //         Row(
-                        //           children: [
-                        //             Icon(
-                        //               Icons.star,
-                        //               color: const Color(0xFFDD143D),
-                        //               size: 15,
-                        //             ),
-                        //             Text(
-                        //               " Accumulated Points ",
-                        //               style: TextStyle(
-                        //                 fontSize: 14,
-                        //               ),
-                        //             )
-                        //           ],
-                        //         )
-                        //       ],
-                        //     ),
-                        //   ),
-                        // ),
-                      ),
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Container(
-                          decoration: BoxDecoration(
-                            border: Border.all(
-                              color: Color(0xFFD2D7DE),
-                            ),
-                            borderRadius: BorderRadius.circular(8),
-                          ),
-                          child: Padding(
-                            padding: const EdgeInsets.only(
-                                top: 16.0, left: 12, bottom: 16, right: 12),
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Row(
-                                  children: [
-                                    Icon(
-                                      Icons.person,
-                                      size: 20,
-                                      color: const Color(0xFFDD143D),
-                                    ),
-                                    Text(
-                                      " Personal Information ",
-                                      style: TextStyle(
-                                        color: const Color(0xFFDD143D),
-                                        fontWeight: FontWeight.w600,
-                                        fontSize: 18,
-                                      ),
-                                    )
-                                  ],
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "Name",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  user!.name,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "Email",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  user!.email,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "Phone Number",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ),
-                                Text(
-                                  user!.phone,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "Province",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ),
-                                isEditable
-                                    ? Container(
-                                  padding:
-                                  const EdgeInsets.only(left: 8.0),
+                              Positioned(
+                                right: 15,
+                                bottom: 10,
+                                child: Container(
                                   decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Color(0xFFD2D7DE),
-                                      width: 2,
-                                    ),
-                                    borderRadius:
-                                    BorderRadius.circular(8.0),
+                                    color: Color(0xFFDD143D),
+                                    shape: BoxShape.circle,
                                   ),
-                                  child: DropdownButton(
-                                    value: _selectedProvince,
-                                    items: Province()
-                                        .map(
-                                          (province) => DropdownMenuItem(
+                                  child: IconButton(
+                                    icon: Icon(
+                                      Icons.camera_alt_outlined,
+                                    ),
+                                    color: Colors.white, // Icon color
+                                    onPressed: () async {
+                                      if (kIsWeb) {
+                                        XFile? image = await _picker.pickImage(
+                                            source: ImageSource.gallery);
+                                        if (image != null) {
+                                          _updateProfilePicture(image);
+                                          var webImg =
+                                              await image.readAsBytes();
+
+                                          setState(() {
+                                      webImage = webImg;
+                                      _imageFile = File('a');
+                                    });
+                                  } else {
+                                    debugPrint("No image Selected");
+                                  }
+                                } else {
+                                  XFile? image = await _picker.pickImage(
+                                      source: ImageSource.gallery);
+                                  if (image != null) {
+                                    _updateProfilePicture(image);
+                                    var selected = File(image.path);
+                                    setState(() {
+                                      _imageFile = selected;
+                                    });
+                                  } else {
+                                    debugPrint("No image Selected");
+                                  }
+                                }
+                              },
+                            ),
+                          ),
+                        ),
+                      ],
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: ElevatedButton(
+                      onPressed: () {
+                        Navigator.push(
+                          context,
+                          MaterialPageRoute(
+                            builder: (context) => PointWidget(),
+                          ),
+                        );
+                      },
+                      style: ElevatedButton.styleFrom(
+                        backgroundColor: const Color(0xFFDD143D),
+                        // Button color
+                        shape: RoundedRectangleBorder(
+                          borderRadius:
+                          BorderRadius.circular(10), // Rounded edges
+                        ),
+                        padding: EdgeInsets.symmetric(
+                            horizontal: 50,
+                            vertical: 15), // Padding to enlarge the button
+                      ),
+                      child: Text(
+                        'Show Points',
+                        style: TextStyle(
+                          color: Colors.white, // Text color
+                          fontSize: 16, // Font size
+                          fontWeight: FontWeight.bold, // Bold text
+                        ),
+                      ),
+                    ),
+
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Container(
+                      decoration: BoxDecoration(
+                        border: Border.all(
+                          color: Color(0xFFD2D7DE),
+                        ),
+                        borderRadius: BorderRadius.circular(8),
+                      ),
+                      child: Padding(
+                        padding: const EdgeInsets.only(
+                            top: 16.0, left: 12, bottom: 16, right: 12),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Row(
+                              children: [
+                                Icon(
+                                  Icons.person,
+                                  size: 20,
+                                  color: const Color(0xFFDD143D),
+                                ),
+                                Text(
+                                  " Personal Information ",
+                                  style: TextStyle(
+                                    color: const Color(0xFFDD143D),
+                                    fontWeight: FontWeight.w600,
+                                    fontSize: 18,
+                                  ),
+                                )
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 8.0,
+                              ),
+                              child: Text(
+                                "Name",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ),
+                            Text(
+                              profileData.first.name,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 8.0,
+                              ),
+                              child: Text(
+                                "Email",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ),
+                            Text(
+                              profileData.first.email,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 8.0,
+                              ),
+                              child: Text(
+                                "Phone Number",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ),
+                            Text(
+                              profileData.first.phone,
+                              style: TextStyle(
+                                fontSize: 18,
+                                color: Colors.black,
+                              ),
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 8.0,
+                              ),
+                              child: Text(
+                                "Province",
+                                style: TextStyle(
+                                  fontSize: 14,
+                                  color: Colors.grey[500],
+                                ),
+                              ),
+                            ),
+                            isEditable
+                                ? Container(
+                              padding:
+                              const EdgeInsets.only(left: 8.0),
+                              decoration: BoxDecoration(
+                                border: Border.all(
+                                  color: Color(0xFFD2D7DE),
+                                  width: 2,
+                                ),
+                                borderRadius:
+                                BorderRadius.circular(8.0),
+                              ),
+                              child: DropdownButton(
+                                value: _selectedProvince,
+                                items: Province()
+                                    .map(
+                                      (province) =>
+                                      DropdownMenuItem(
                                         value: province,
                                         child: Text(
                                           province,
                                         ),
                                       ),
-                                    )
-                                        .toList(),
-                                    onChanged: (dynamic value) {
-                                      if (value == null) {
-                                        return;
-                                      }
-                                      setState(() {
-                                        _selectedDistrict = null;
-                                        _selectedProvince = value;
-                                      });
-                                    },
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: const Color(0xFFD50032),
-                                      fontSize: 16,
-                                    ),
-                                    hint: Text(
-                                      'Select the province',
-                                      style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
-                                      ),
-                                    ),
-                                    icon: const Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: Color(0xFFD50032),
-                                      size: 24,
-                                    ),
-                                    elevation: 2,
-                                    underline: Container(
-                                      height: 0,
-                                    ),
-                                    isExpanded: true,
-                                  ),
-                                )
-                                    : Text(
-                                  _selectedProvince?? 'N/A',
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "District",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ),
-                                isEditable
-                                    ? Container(
-                                  padding: const EdgeInsets.only(left: 8.0),
-                                  decoration: BoxDecoration(
-                                    border: Border.all(
-                                      color: Color(0xFFD2D7DE),
-                                      width: 2,
-                                    ),
-                                    borderRadius: BorderRadius.circular(8.0),
-                                  ),
-                                  child: DropdownButton(
-                                    value: _selectedDistrict,
-                                    items: _selectedProvince != null
-                                        ? getDistrictsByProvince(_selectedProvince!)
-                                        .map((disct) {
-                                      return DropdownMenuItem(
-                                        value: disct,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Text(
-                                            disct
-                                                .toString()
-                                                .replaceAll('District.', ''),
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
+                                                )
+                                                .toList(),
+                                            onChanged: (dynamic value) {
+                                              setState(() {
+                                                _selectedProvince = value;
+                                                _selectedDistrict =
+                                                    null; // Reset the district when province changes
+                                                debugPrint(
+                                                    "Selected Province: $_selectedProvince");
+                                              });
+                                            },
+                                            style: TextStyle(
+                                              fontFamily: 'Poppins',
+                                              color: const Color(0xFFD50032),
+                                              fontSize: 16,
+                                            ),
+                                            hint: Text(
+                                              'Select the province',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              color: Color(0xFFD50032),
+                                              size: 24,
+                                            ),
+                                            elevation: 2,
+                                            underline: Container(
+                                              height: 0,
+                                            ),
+                                            isExpanded: true,
+                                          ),
+                                        )
+                                      : Text(
+                                          _selectedProvince == null ||
+                                                  _selectedProvince!.isEmpty
+                                              ? 'N/A'
+                                              : _selectedProvince!,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.black,
                                           ),
                                         ),
-                                      );
-                                    }).toList()
-                                        : getDistrictsByProvince(
-                                        _selectedProvince ?? '')
-                                        .map((dis) {
-                                      return DropdownMenuItem(
-                                        value: dis,
-                                        child: FittedBox(
-                                          fit: BoxFit.contain,
-                                          child: Text(
-                                            dis,
-                                            maxLines: 2,
-                                            overflow: TextOverflow.ellipsis,
-                                          ),
-                                        ),
-                                      );
-                                    }).toList(),
-                                    onChanged: (dynamic value) {
-                                      if (value == null) {
-                                        return;
-                                      }
-                                      setState(() {
-                                        _selectedDistrict = value;
-                                      });
-                                    },
-                                    style: TextStyle(
-                                      fontFamily: 'Poppins',
-                                      color: const Color(0xFFD50032),
-                                      fontSize: 16,
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 8.0,
                                     ),
-                                    hint: Text(
-                                      'Select the district',
+                                    child: Text(
+                                      "District",
                                       style: TextStyle(
-                                        fontSize: 16,
-                                        color: Colors.grey,
+                                        fontSize: 14,
+                                        color: Colors.grey[500],
                                       ),
                                     ),
-                                    icon: const Icon(
-                                      Icons.keyboard_arrow_down_rounded,
-                                      color: Color(0xFFD50032),
-                                      size: 24,
-                                    ),
-                                    elevation: 2,
-                                    underline: Container(
-                                      height: 0,
-                                    ),
-                                    isExpanded: true,
                                   ),
-                                )
-                                    : Text(
-                                        _selectedDistrict?? 'N/A',
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "Address",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ),
-                                isEditable
-                                    ? TextFormField(
-                                  controller: addressController,
-                                  decoration: InputDecoration(
-                                    enabledBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0xFFD2D7DE),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                    focusedBorder: OutlineInputBorder(
-                                      borderSide: const BorderSide(
-                                        color: Color(0xFFD50032),
-                                        width: 2,
-                                      ),
-                                      borderRadius: BorderRadius.circular(8),
-                                    ),
-                                  ),
-                                )
-                                    : Text(
-                                  addressController.text,
-                                  style: TextStyle(
-                                    fontSize: 18,
-                                    color: Colors.black,
-                                  ),
-                                ),
-                                Padding(
-                                  padding: const EdgeInsets.only(
-                                    top: 8.0,
-                                  ),
-                                  child: Text(
-                                    "Secondary Number",
-                                    style: TextStyle(
-                                      fontSize: 14,
-                                      color: Colors.grey[500],
-                                    ),
-                                  ),
-                                ),
-                                isEditable
-                                    ? TextFormField(
-                                        controller: secondaryNumberController,
-                                        decoration: InputDecoration(
-                                          enabledBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
+                                  isEditable
+                                      ? Container(
+                                          padding:
+                                              const EdgeInsets.only(left: 8.0),
+                                          decoration: BoxDecoration(
+                                            border: Border.all(
                                               color: Color(0xFFD2D7DE),
                                               width: 2,
                                             ),
-                                            borderRadius: BorderRadius.circular(8),
+                                            borderRadius:
+                                                BorderRadius.circular(8.0),
                                           ),
-                                          focusedBorder: OutlineInputBorder(
-                                            borderSide: const BorderSide(
-                                              color: Color(0xFFD50032),
-                                              width: 2,
-                                            ),
-                                            borderRadius: BorderRadius.circular(8),
-                                          ),
-                                        ),
-                                      )
-                                    : Text(
-                                        secondaryNumberController.text.isEmpty
-                                            ? 'N/A'
-                                            : secondaryNumberController.text,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          color: Colors.black,
-                                        ),
-                                      ),
-                                isEditable
-                                    ? Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 16.0),
-                                        child: Row(
-                                          mainAxisAlignment: kIsWeb
-                                              ? MainAxisAlignment.start
-                                              : MainAxisAlignment.spaceBetween,
-                                          children: [
-                                            ElevatedButton(
-                                              onPressed: () {
-                                                setState(() {
-                                                  isEditable = !isEditable;
-                                                });
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: const Color(
-                                                    0xFFDD143D), // Button color
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20), // Rounded edges
-                                                ),
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 50,
-                                                    vertical:
-                                                        15), // Padding to enlarge the button
-                                              ),
-                                              child: Text(
-                                                'Close',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  // Text color
-                                                  fontSize: 16,
-                                                  // Font size
-                                                  fontWeight: FontWeight
-                                                      .bold, // Bold text
-                                                ),
-                                              ),
-                                            ),
-
-                                            SizedBox(
-                                              width: 50,
-                                            ),
-                                            ElevatedButton(
-                                              onPressed: () async {
-                                                await _updateUser();
-                                                setState(() {
-                                                  isEditable = !isEditable;
-                                                });
-                                                debugPrint("Save Clicked");
-                                              },
-                                              style: ElevatedButton.styleFrom(
-                                                backgroundColor: const Color(
-                                                    0xFFDD143D), // Button color
-                                                shape: RoundedRectangleBorder(
-                                                  borderRadius:
-                                                      BorderRadius.circular(
-                                                          20), // Rounded edges
-                                                ),
-                                                padding: EdgeInsets.symmetric(
-                                                    horizontal: 50,
-                                                    vertical:
-                                                        15), // Padding to enlarge the button
-                                              ),
-                                              child: Text(
-                                                'Save',
-                                                style: TextStyle(
-                                                  color: Colors.white,
-                                                  // Text color
-                                                  fontSize: 16,
-                                                  // Font size
-                                                  fontWeight: FontWeight
-                                                      .bold, // Bold text
-                                                ),
-                                              ),
-                                            ),
-                                          ],
-                                        ),
-                                      )
-                                    : Padding(
-                                        padding:
-                                            const EdgeInsets.only(top: 16.0),
-                                        child: ElevatedButton(
-                                          onPressed: () {
-                                            setState(() {
-                                              isEditable = !isEditable;
-                                            });
-                                          },
-                                          style: ElevatedButton.styleFrom(
-                                            backgroundColor:
-                                                const Color(0xFFDD143D),
-                                            // Button color
-                                            shape: RoundedRectangleBorder(
-                                              borderRadius:
-                                                  BorderRadius.circular(
-                                                      20), // Rounded edges
-                                            ),
-                                            padding: EdgeInsets.symmetric(
-                                                horizontal: 50,
-                                                vertical:
-                                                    15), // Padding to enlarge the button
-                                          ),
-                                          child: Text(
-                                            'Edit',
+                                          child: DropdownButton(
+                                            value: _selectedDistrict,
+                                            items: _selectedProvince != null
+                                                ? getDistrictsByProvince(
+                                                        _selectedProvince!)
+                                                    .map((disct) {
+                                                    return DropdownMenuItem(
+                                                      value: disct,
+                                                      child: FittedBox(
+                                                        fit: BoxFit.contain,
+                                                        child: Text(
+                                                          disct
+                                                              .toString()
+                                                              .replaceAll(
+                                                                  'District.',
+                                                                  ''),
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList()
+                                                : getDistrictsByProvince(
+                                                        _selectedProvince ?? '')
+                                                    .map((dis) {
+                                                    return DropdownMenuItem(
+                                                      value: dis,
+                                                      child: FittedBox(
+                                                        fit: BoxFit.contain,
+                                                        child: Text(
+                                                          dis,
+                                                          maxLines: 2,
+                                                          overflow: TextOverflow
+                                                              .ellipsis,
+                                                        ),
+                                                      ),
+                                                    );
+                                                  }).toList(),
+                                            onChanged: (dynamic value) {
+                                              if (value == null) {
+                                                return;
+                                              }
+                                              setState(() {
+                                                _selectedDistrict = value;
+                                              });
+                                            },
                                             style: TextStyle(
-                                              color: Colors.white, // Text color
-                                              fontSize: 16, // Font size
-                                              fontWeight:
-                                                  FontWeight.bold, // Bold text
+                                              fontFamily: 'Poppins',
+                                              color: const Color(0xFFD50032),
+                                              fontSize: 16,
+                                            ),
+                                            hint: Text(
+                                              'Select the district',
+                                              style: TextStyle(
+                                                fontSize: 16,
+                                                color: Colors.grey,
+                                              ),
+                                            ),
+                                            icon: const Icon(
+                                              Icons.keyboard_arrow_down_rounded,
+                                              color: Color(0xFFD50032),
+                                              size: 24,
+                                            ),
+                                            elevation: 2,
+                                            underline: Container(
+                                              height: 0,
+                                            ),
+                                            isExpanded: true,
+                                          ),
+                                        )
+                                      : Text(
+                                          _selectedDistrict == null ||
+                                                  _selectedDistrict!.isEmpty
+                                              ? 'N/A'
+                                              : _selectedDistrict!,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 8.0,
+                                    ),
+                                    child: Text(
+                                      "Address",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[500],
+                                      ),
+                                    ),
+                                  ),
+                                  isEditable
+                                      ? TextFormField(
+                                          controller: addressController,
+                                          decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                color: Color(0xFFD2D7DE),
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                color: Color(0xFFD50032),
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          addressController.text.isEmpty
+                                              ? 'N/A'
+                                              : addressController.text,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                  Padding(
+                                    padding: const EdgeInsets.only(
+                                      top: 8.0,
+                                    ),
+                                    child: Text(
+                                      "Secondary Number",
+                                      style: TextStyle(
+                                        fontSize: 14,
+                                        color: Colors.grey[500],
+                                      ),
+                                    ),
+                                  ),
+                                  isEditable
+                                      ? TextFormField(
+                                          controller: secondaryNumberController,
+                                          decoration: InputDecoration(
+                                            enabledBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                color: Color(0xFFD2D7DE),
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                            focusedBorder: OutlineInputBorder(
+                                              borderSide: const BorderSide(
+                                                color: Color(0xFFD50032),
+                                                width: 2,
+                                              ),
+                                              borderRadius:
+                                                  BorderRadius.circular(8),
+                                            ),
+                                          ),
+                                        )
+                                      : Text(
+                                          secondaryNumberController.text.isEmpty
+                                              ? 'N/A'
+                                              : secondaryNumberController.text,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                  isEditable
+                                      ? Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 16.0),
+                                          child: Row(
+                                            mainAxisAlignment: kIsWeb
+                                                ? MainAxisAlignment.start
+                                                : MainAxisAlignment
+                                                    .spaceBetween,
+                                            children: [
+                                              ElevatedButton(
+                                                onPressed: () {
+                                                  setState(() {
+                                                    _selectedDistrict =
+                                                        profileData
+                                                                .first
+                                                                .district
+                                                                .isEmpty
+                                                            ? null
+                                                            : profileData
+                                                                .first.district;
+                                                    _selectedProvince =
+                                                        profileData
+                                                                .first
+                                                                .province
+                                                                .isEmpty
+                                                            ? null
+                                                            : profileData
+                                                                .first.province;
+                                                    isEditable = !isEditable;
+                                                  });
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: const Color(
+                                                      0xFFDD143D), // Button color
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20), // Rounded edges
+                                                  ),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 50,
+                                                      vertical:
+                                                          15), // Padding to enlarge the button
+                                                ),
+                                                child: Text(
+                                                  'Close',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    // Text color
+                                                    fontSize: 16,
+                                                    // Font size
+                                                    fontWeight: FontWeight
+                                                        .bold, // Bold text
+                                                  ),
+                                                ),
+                                              ),
+                                              SizedBox(
+                                                width: 50,
+                                              ),
+                                              ElevatedButton(
+                                                onPressed: () async {
+                                                  await _updateUser();
+                                                  setState(() {
+                                                    isEditable = !isEditable;
+                                                  });
+                                                  debugPrint("Save Clicked");
+                                                },
+                                                style: ElevatedButton.styleFrom(
+                                                  backgroundColor: const Color(
+                                                      0xFFDD143D), // Button color
+                                                  shape: RoundedRectangleBorder(
+                                                    borderRadius:
+                                                        BorderRadius.circular(
+                                                            20), // Rounded edges
+                                                  ),
+                                                  padding: EdgeInsets.symmetric(
+                                                      horizontal: 50,
+                                                      vertical:
+                                                          15), // Padding to enlarge the button
+                                                ),
+                                                child: Text(
+                                                  'Save',
+                                                  style: TextStyle(
+                                                    color: Colors.white,
+                                                    // Text color
+                                                    fontSize: 16,
+                                                    // Font size
+                                                    fontWeight: FontWeight
+                                                        .bold, // Bold text
+                                                  ),
+                                                ),
+                                              ),
+                                            ],
+                                          ),
+                                        )
+                                      : Padding(
+                                          padding:
+                                              const EdgeInsets.only(top: 16.0),
+                                          child: ElevatedButton(
+                                            onPressed: () {
+                                              setState(() {
+                                                isEditable = !isEditable;
+                                              });
+                                            },
+                                            style: ElevatedButton.styleFrom(
+                                              backgroundColor:
+                                                  const Color(0xFFDD143D),
+                                              // Button color
+                                              shape: RoundedRectangleBorder(
+                                                borderRadius:
+                                                    BorderRadius.circular(
+                                                        20), // Rounded edges
+                                              ),
+                                              padding: EdgeInsets.symmetric(
+                                                  horizontal: 50,
+                                                  vertical:
+                                                      15), // Padding to enlarge the button
+                                            ),
+                                            child: Text(
+                                              'Edit',
+                                              style: TextStyle(
+                                                color:
+                                                    Colors.white, // Text color
+                                                fontSize: 16, // Font size
+                                                fontWeight: FontWeight
+                                                    .bold, // Bold text
+                                              ),
                                             ),
                                           ),
                                         ),
-                                      ),
-                              ],
+                                ],
+                              ),
                             ),
                           ),
                         ),
-                      ),
-                      !kIsWeb
-                          ? Padding(
-                              padding: const EdgeInsets.only(top: 16.0 ,bottom: 16.0),
-                              child: ElevatedButton(
-                                onPressed: () async{
-                                  await secureStorage.deleteAll();
-                                  Navigator.push(
-                                    context,
-                                    MaterialPageRoute(
-                                      builder: (context) => const DashboardWidget(
-                                        tabIndex: 0,
+                        !kIsWeb
+                            ? Padding(
+                                padding: const EdgeInsets.only(
+                                    top: 16.0, bottom: 16.0),
+                                child: ElevatedButton(
+                                  onPressed: () async {
+                                    await secureStorage.deleteAll();
+                                    Navigator.push(
+                                      context,
+                                      MaterialPageRoute(
+                                        builder: (context) =>
+                                            const DashboardWidget(
+                                          tabIndex: 0,
+                                        ),
                                       ),
+                                    );
+                                  },
+                                  style: ElevatedButton.styleFrom(
+                                    backgroundColor: const Color(0xFFDD143D),
+                                    // Button color
+                                    shape: RoundedRectangleBorder(
+                                      borderRadius: BorderRadius.circular(
+                                          20), // Rounded edges
                                     ),
-                                  );
-                                },
-                                style: ElevatedButton.styleFrom(
-                                  backgroundColor: const Color(0xFFDD143D),
-                                  // Button color
-                                  shape: RoundedRectangleBorder(
-                                    borderRadius: BorderRadius.circular(
-                                        20), // Rounded edges
+                                    padding: EdgeInsets.symmetric(
+                                        horizontal: 50,
+                                        vertical:
+                                            15), // Padding to enlarge the button
                                   ),
-                                  padding: EdgeInsets.symmetric(
-                                      horizontal: 50,
-                                      vertical:
-                                          15), // Padding to enlarge the button
-                                ),
-                                child: Text(
-                                  'Logout',
-                                  style: TextStyle(
-                                    color: Colors.white, // Text color
-                                    fontSize: 16, // Font size
-                                    fontWeight: FontWeight.bold, // Bold text
+                                  child: Text(
+                                    'Logout',
+                                    style: TextStyle(
+                                      color: Colors.white, // Text color
+                                      fontSize: 16, // Font size
+                                      fontWeight: FontWeight.bold, // Bold text
+                                    ),
                                   ),
                                 ),
-                              ),
-                            )
-                          : Material(),
-                    ],
+                              )
+                            : Material(),
+                      ],
+                    ),
                   ),
                 ),
-              );
-            }
-          },
         ),
       ),
     );

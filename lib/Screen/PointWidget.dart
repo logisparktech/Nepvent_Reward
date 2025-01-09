@@ -1,7 +1,9 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
+import 'package:nepvent_reward/Provider/NepventProvider.dart';
 import 'package:nepvent_reward/Screen/LoginDashboardWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
+import 'package:provider/provider.dart';
 
 class PointWidget extends StatefulWidget {
   const PointWidget({super.key});
@@ -11,6 +13,8 @@ class PointWidget extends StatefulWidget {
 }
 
 class _PointWidgetState extends State<PointWidget> {
+  double maxValue = 10000;
+
   @override
   Widget build(BuildContext context) {
     debugPrint('Vendor Detail : ${vendorDetailModel.length}');
@@ -79,7 +83,7 @@ class _PointWidgetState extends State<PointWidget> {
                                 ),
                                 errorWidget: (context, url, error) =>
                                     Image.asset(
-                                  'assets/icon/icon.png',
+                                  'assets/icon/icon.jpg',
                                   width: 80,
                                   height: 80,
                                   fit: BoxFit.cover,
@@ -99,30 +103,6 @@ class _PointWidgetState extends State<PointWidget> {
                                     fontSize: 16,
                                   ),
                                 ),
-
-                                // Progress Bar
-                                // Padding(
-                                //   padding: const EdgeInsets.fromLTRB(0, 8, 8, 8),
-                                //   child: Stack(
-                                //     children: [
-                                //       Container(
-                                //         height: 8,
-                                //         decoration: BoxDecoration(
-                                //           color: Colors.grey[300],
-                                //           borderRadius: BorderRadius.circular(4),
-                                //         ),
-                                //       ),
-                                //       Container(
-                                //         height: 8,
-                                //         width: 100, // Adjust this width for progress
-                                //         decoration: BoxDecoration(
-                                //           color: Colors.green,
-                                //           borderRadius: BorderRadius.circular(4),
-                                //         ),
-                                //       ),
-                                //     ],
-                                //   ),
-                                // ),
                                 Padding(
                                   padding:
                                       const EdgeInsets.fromLTRB(0, 8, 8, 8),
@@ -133,7 +113,7 @@ class _PointWidgetState extends State<PointWidget> {
                                       minHeight: 7,
                                       valueColor: AlwaysStoppedAnimation(
                                           Color(0xFFDD143D)),
-                                      value: 0.5,
+                                      value: (vendor.points) / maxValue,
                                     ),
                                   ),
                                 ),
@@ -152,9 +132,8 @@ class _PointWidgetState extends State<PointWidget> {
                                     // Icon
                                     IconButton(
                                       onPressed: () {
-                                        // context
-                                        //     .read<NepventProvider>()
-                                        //     .setVendor(vendor.vendorName);
+                                        context.read<NepventProvider>()
+                                            .setVendor(vendor.vendorName);
                                         Navigator.push(
                                           context,
                                           MaterialPageRoute(

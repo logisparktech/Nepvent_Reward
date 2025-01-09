@@ -1,7 +1,6 @@
 plugins {
     id "com.android.application"
     id "kotlin-android"
-    // The Flutter Gradle Plugin must be applied after the Android and Kotlin Gradle plugins.
     id "dev.flutter.flutter-gradle-plugin"
 }
 
@@ -11,13 +10,11 @@ android {
     ndkVersion = "26.1.10909125"
 
     compileOptions {
+        coreLibraryDesugaringEnabled true
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
-        coreLibraryDesugaringEnabled true
     }
-    dependencies {
-        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.2'
-    }
+
 
     kotlinOptions {
         jvmTarget = JavaVersion.VERSION_17
@@ -30,22 +27,34 @@ android {
         // For more information, see: https://flutter.dev/to/review-gradle-config.
         minSdk = flutter.minSdkVersion
         targetSdk = 34
-        versionCode = flutter.versionCode
-        versionName = flutter.versionName
+        versionCode = 5
+        versionName = "1.0.2"
+
+    }
+    signingConfigs {
+        release {
+            storeFile file("D:/nepvent_reward/release-key.jks") // Path to your keystore
+            storePassword 'NepVentReward@123'      // Keystore password
+            keyAlias 'release'                          // Key alias
+            keyPassword 'NepVentReward@123'             // Key password
+        }
     }
 
     buildTypes {
         release {
             // TODO: Add your own signing config for the release build.
             // Signing with the debug keys for now, so `flutter run --release` works.
-            signingConfig = signingConfigs.debug
+            signingConfig = signingConfigs.release
+            minifyEnabled true
+            shrinkResources true // Removes unused resources
+            proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
         }
+        }
+    dependencies {
+        coreLibraryDesugaring 'com.android.tools:desugar_jdk_libs:2.1.4'
     }
-
-
-
-
 }
+
 
 flutter {
     source = "../.."

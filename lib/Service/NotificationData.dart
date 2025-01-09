@@ -10,11 +10,13 @@ class NotificationData {
   show(String title, String message, date, imageUrl) async {
     if (message.isNotEmpty && title.isNotEmpty) {
       BigPictureStyleInformation? bigPictureStyleInformation;
-      String? localImagePath;
+      String? localImagePath ;
+
       if (imageUrl.isNotEmpty) {
         localImagePath =
             await _downloadAndSaveImage(imageUrl, 'notification_image.png');
       }
+
       if (localImagePath != null) {
         bigPictureStyleInformation = BigPictureStyleInformation(
           FilePathAndroidBitmap(localImagePath), // Path to the downloaded image
@@ -33,6 +35,7 @@ class NotificationData {
         priority: Priority.high,
         autoCancel: true,
         styleInformation: bigPictureStyleInformation,
+        largeIcon:localImagePath != null ? FilePathAndroidBitmap(localImagePath) : null,
       );
       NotificationDetails platformChannelSpecifics = NotificationDetails(
         android: androidPlatformChannelSpecifics,
@@ -47,7 +50,7 @@ class NotificationData {
       debugPrint('Message And Title is Empty or null');
     }
     debugPrint(' Notification Message : $message');
-    debugPrint(' Notification Message : $imageUrl');
+    debugPrint(' Notification image : $imageUrl');
   }
 
   Future<String?> _downloadAndSaveImage(String url, String fileName) async {

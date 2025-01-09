@@ -1,9 +1,10 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
-import 'package:material_design_icons_flutter/material_design_icons_flutter.dart';
+import 'package:intl/intl.dart';
 import 'package:nepvent_reward/Model/NotificationModel.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
+import 'package:url_launcher/url_launcher.dart';
 
 class NotificationWidget extends StatefulWidget {
   const NotificationWidget({super.key});
@@ -27,7 +28,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
     try {
       final Response response = await dio.get(urls['Notification']!);
       final body = response.data['data']['data'];
-      // debugPrint(" *********** Notification Body ***********  $body");
+      debugPrint(" *********** Notification Body ***********  $body");
 
       List<NotificationModel> newNotificationData = [];
       body.forEach((item) {
@@ -89,6 +90,7 @@ class _NotificationWidgetState extends State<NotificationWidget> {
 
   @override
   Widget build(BuildContext context) {
+    Size screen = MediaQuery.sizeOf(context);
     return Scaffold(
       backgroundColor: Colors.white,
       appBar: AppBar(
@@ -127,71 +129,160 @@ class _NotificationWidgetState extends State<NotificationWidget> {
                     )
                   : ListView.builder(
                       itemCount: notificationModel.length,
-                itemBuilder: (context, index) {
-                  final notification = notificationModel[index];
-                  final bool isSeen =
-                      notification.viewedUser.contains(currentUserId);
-                  return Container(
-                    margin: EdgeInsets.symmetric(vertical: 8, horizontal: 16),
-                    padding: EdgeInsets.all(12),
-                    decoration: BoxDecoration(
-                      color: Colors.white,
-                      borderRadius: BorderRadius.circular(8),
-                      boxShadow: [
-                        BoxShadow(
-                          color: Colors.grey.withOpacity(0.2),
-                          spreadRadius: 2,
-                          blurRadius: 5,
-                          offset: Offset(0, 3),
-                        ),
-                      ],
-                    ),
-                    child: InkWell(
-                      onTap: () {
-                        _markAsSeen(notification.id.toString());
-                      },
-                      child: Row(
-                        children: [
-                          Expanded(
-                            child: Column(
-                              crossAxisAlignment: CrossAxisAlignment.start,
-                              children: [
-                                Text(
+                      itemBuilder: (context, index) {
+                        final notification = notificationModel[index];
+                        final bool isSeen =
+                            notification.viewedUser.contains(currentUserId);
+                        String filterDate =
+                            DateFormat.yMMMMEEEEd().format(notification.date);
+                        DateTime dateTime =
+                            DateFormat("HH:mm").parse(notification.time);
+
+                        // Convert to 12-hour AM/PM format
+                        String formatedTime =
+                            DateFormat("hh:mm a").format(dateTime);
+
+                        return Padding(
+                          padding: const EdgeInsets.symmetric(
+                              horizontal: 8.0, vertical: 4.0),
+                          child: GestureDetector(
+                            onTap: () async{
+                              if(notification.redirectedUrl.isNotEmpty) {
+                                // Open URL when tapped
+                                final Uri uri = Uri.parse(
+                                    notification.redirectedUrl);
+                                if (!await launchUrl(
+                                  uri,
+                                  mode: LaunchMode.platformDefault,
+                                  // Open in external browser
+                                  webViewConfiguration: const WebViewConfiguration(
+                                    enableJavaScript: true,
+                                    enableDomStorage: true,
+                                  ),
+                                )) {
+                                  throw Exception(
+                                      'Could not launch ${ notification.redirectedUrl}');
+                                }
+                              }
+                            },
+                            child: Card(
+                              shape: RoundedRectangleBorder(
+                                  borderRadius: BorderRadius.circular(12.0)),
+                              color:
+                                  isSeen ? Colors.white : Colors.blue.shade50,
+                              elevation: 4.0,
+                              child: ExpansionTile(
+                                leading: Icon(
+                                  isSeen
+                                      ? Icons.notifications
+                                      : Icons.notifications_active,
+                                  color: isSeen ? Colors.grey : Colors.blue,
+                                ),
+                                title: Text(
                                   notification.title,
                                   style: TextStyle(
-                                    fontWeight: FontWeight.w600,
-                                    fontSize: 16,
-                                    color: Colors.grey[700],
+                                    fontWeight: FontWeight.bold,
+                                    color: isSeen
+                                        ? Colors.grey.shade700
+                                        : Colors.black,
                                   ),
                                 ),
-                                SizedBox(height: 4),
-                                Text(
-                                  notification.content,
-                                  maxLines: 2,
-                                  overflow: TextOverflow.ellipsis,
+                                subtitle: Text(
+                                  ' $filterDate, $formatedTime',
                                   style: TextStyle(
-                                    color: Colors.grey,
-                                    fontSize: 14,
+                                    color: Colors.grey.shade600,
+                                    fontSize: 12.0,
                                   ),
                                 ),
-                              ],
-                            ),
-                          ),
-                          if (!isSeen)
-                            Container(
-                              margin: EdgeInsets.only(left: 8),
-                              child: Icon(
-                                MdiIcons.circle,
-                                size: 10,
-                                color: Color(0xFFD50032),
+                                onExpansionChanged: (isExpanded) {
+                                  if (isExpanded && !isSeen) {
+                                    setState(() {
+                                      _markAsSeen(notification.id.toString());
+                                    });
+                                  }
+                                },
+                                children: [
+                                  Padding(
+                                    padding: const EdgeInsets.all(16.0),
+                                    child: Column(
+                                      crossAxisAlignment:
+                                          CrossAxisAlignment.start,
+                                      children: [
+                                        notification
+                                                .notificationPicture.isNotEmpty
+                                            ? SizedBox(
+                                                height: 120,
+                                                child: ListView.builder(
+                                                  scrollDirection:
+                                                      Axis.horizontal,
+                                                  itemCount: notification
+                                                      .notificationPicture
+                                                      .length,
+                                                  itemBuilder:
+                                                      (context, picIndex) {
+                                                    final pic = notification
+                                                            .notificationPicture[
+                                                        picIndex];
+                                                    return Padding(
+                                                      padding: const EdgeInsets
+                                                          .symmetric(
+                                                          horizontal: 6.0),
+                                                      child: ClipRRect(
+                                                        borderRadius:
+                                                            BorderRadius
+                                                                .circular(12.0),
+                                                        child: Image.network(
+                                                          pic.url,
+                                                          width:
+                                                              screen.width - 65,
+                                                          height: 300,
+                                                          fit: BoxFit.contain,
+                                                          loadingBuilder: (context,
+                                                              child,
+                                                              loadingProgress) {
+                                                            if (loadingProgress ==
+                                                                null) {
+                                                              return child;
+                                                            }
+                                                            return Center(
+                                                              child:
+                                                                  CircularProgressIndicator(
+                                                                value: loadingProgress
+                                                                            .expectedTotalBytes !=
+                                                                        null
+                                                                    ? loadingProgress
+                                                                            .cumulativeBytesLoaded /
+                                                                        (loadingProgress.expectedTotalBytes ??
+                                                                            1)
+                                                                    : null,
+                                                              ),
+                                                            );
+                                                          },
+                                                        ),
+                                                      ),
+                                                    );
+                                                  },
+                                                ),
+                                              )
+                                            : Material(),
+                                        SizedBox(height: 4.0),
+                                        Text(
+                                          notification.content,
+                                          style: TextStyle(
+                                            fontSize: 14.0,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                      ],
+                                    ),
+                                  ),
+                                ],
                               ),
                             ),
-                        ],
-                      ),
-                    ),
-                  );
-                },
-              );
+                          ),
+                        );
+                      },
+                    );
             }
           },
         ),

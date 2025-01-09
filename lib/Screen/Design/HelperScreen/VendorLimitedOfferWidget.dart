@@ -72,7 +72,10 @@ class VendorLimitedOfferWidget extends StatelessWidget {
                       ),
                     ),
                   ),
-                  errorWidget: (context, url, error) => Icon(Icons.error),
+                  errorWidget: (context, url, error) => Image.asset(
+                    'assets/icon/icon.jpg',
+                    fit: BoxFit.cover,
+                  ),
                 ),
               ),
             ),
@@ -87,7 +90,8 @@ class VendorLimitedOfferWidget extends StatelessWidget {
                   borderRadius: BorderRadius.circular(8),
                 ),
                 child: Text(
-                  discount == -1 ? 'FREE' : '$discount% OFF',
+                  discount == -1 ? 'FREE Items' : '$discount% OFF',
+                  textAlign: TextAlign.center,
                   style: TextStyle(
                     color: Colors.white,
                     fontWeight: FontWeight.bold,

@@ -3,11 +3,13 @@ import 'package:dio/dio.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:nepvent_reward/Model/CustomerInsightsModel.dart';
+import 'package:nepvent_reward/Provider/NepventProvider.dart';
 import 'package:nepvent_reward/Screen/DashboardWidget.dart';
 import 'package:nepvent_reward/Screen/LoginDashboardWidget.dart';
 import 'package:nepvent_reward/Screen/LoginWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
+import 'package:provider/provider.dart';
 
 class VendorDetailWidget extends StatefulWidget {
   const VendorDetailWidget({
@@ -132,7 +134,16 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                         ),
                       ],
                     )
-                  : Text('Vendor Details'),
+                  : Material(),
+              // Text('Vendor Details'),
+              leading: kIsWeb
+                  ? Material()
+                  : IconButton(
+                      icon: Icon(Icons.arrow_back), // Leading icon
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
+                    ),
               actions: [
                 Padding(
                   padding: const EdgeInsets.only(right: 24),
@@ -355,8 +366,17 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                         ),
                       ],
                     )
-                  : Text(
-                      'vendor',
+                  : Material(),
+              // Text(
+              //         'Vendor Detail',
+              //       ),
+              leading: kIsWeb
+                  ? Material()
+                  : IconButton(
+                      icon: Icon(Icons.arrow_back), // Leading icon
+                      onPressed: () {
+                        Navigator.pop(context);
+                      },
                     ),
               actions: [
                 isWeb
@@ -489,7 +509,7 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                           decoration: BoxDecoration(
                             image: DecorationImage(
                               image: imageProvider,
-                              fit: BoxFit.fill,
+                              fit: kIsWeb ? BoxFit.fill : BoxFit.cover,
                             ),
                           ),
                         ),
@@ -501,7 +521,10 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                             ),
                           ),
                         ),
-                        errorWidget: (context, url, error) => Icon(Icons.error),
+                        errorWidget: (context, url, error) => Image.asset(
+                          'assets/icon/icon.jpg',
+                          fit: BoxFit.fill,
+                        ),
                       ),
                     ),
                     Container(
@@ -986,6 +1009,11 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
                                             ),
                                             TextButton.icon(
                                               onPressed: () {
+                                                context
+                                                    .read<NepventProvider>()
+                                                    .setVendor(
+                                                      widget.vendorName,
+                                                    );
                                                 Navigator.push(
                                                   context,
                                                   MaterialPageRoute(
@@ -1099,7 +1127,8 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             Text(
-              discount == -1 ? 'FREE' : '$discount%',
+              discount == -1 ? 'FREE Items' : '$discount%',
+              textAlign: TextAlign.center,
               style: TextStyle(
                 color: Colors.white,
                 fontWeight: FontWeight.bold,
@@ -1145,7 +1174,8 @@ class _VendorDetailWidgetState extends State<VendorDetailWidget> {
         padding: const EdgeInsets.only(left: 8, right: 8),
         child: Center(
           child: Text(
-            discount == -1 ? 'FREE' : '$discount% OFF',
+            discount == -1 ? 'FREE Items' : '$discount% OFF',
+            textAlign: TextAlign.center,
             style: TextStyle(
               color: Colors.white,
               fontWeight: FontWeight.bold,

@@ -71,14 +71,18 @@ class _CheckState extends State<Check> {
         if (snapshot.connectionState == ConnectionState.waiting) {
           return Scaffold(
             key: scaffoldKey,
-            body: const CircularProgressIndicator(),
+            body: Center(
+              child: const CircularProgressIndicator(),
+            ),
           );
         } else {
           if (snapshot.hasError) {
             debugPrint('${snapshot.error}');
             return Scaffold(
               key: scaffoldKey,
-              body: const CircularProgressIndicator(),
+              body: Center(
+                child: const CircularProgressIndicator(),
+              ),
             );
           } else {
             String token = snapshot.data['token'] ?? '';

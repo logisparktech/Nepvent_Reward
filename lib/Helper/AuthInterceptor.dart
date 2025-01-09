@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
+import 'package:nepvent_reward/Screen/DashboardWidget.dart';
 import 'package:nepvent_reward/Utils/Global.dart';
 import 'package:nepvent_reward/Utils/Urls.dart';
 
@@ -56,77 +57,51 @@ class AuthInterceptor extends Interceptor {
   }
 
   @override
-  void onError(DioException err, ErrorInterceptorHandler handler) {
-    // TODO: implement onError
+  void onError(DioException err, ErrorInterceptorHandler handler) async {
     try {
       if (err.response != null) {
-        BuildContext? c = navigatorKey.currentContext;
-        // Unauthorised / token expired
+        BuildContext? context = navigatorKey.currentContext;
+
         if (err.response?.statusCode == 401) {
           String? message;
+
+          // Determine the error message
           if (err.response?.data != null) {
             if (err.response?.data.runtimeType == String) {
-              message = 'Session Expired. Please Sign-in Again';
+              message = 'Session Expired. Please Sign-in Again.';
             } else {
               message = err.response?.data['message'];
             }
           } else {
-            message = null;
+            message = 'Session Expired. Please Sign-in Again.';
           }
-          // Navigator.pushReplacement(
-          //     c!,
-          //     MaterialPageRoute(
-          //       builder: (c) => const LogInWidget(),
-          //     ));
-        } else if (err.response?.statusCode == 404) {
-          String? message;
-          if (err.response?.data != null) {
-            if (err.response?.data.runtimeType == String) {
-              message = 'Url not Found';
-            } else {
-              message = err.response?.data['message'].toString();
-            }
-          } else {
-            message = null;
+
+          // Clear token
+          await secureStorage.delete(key: 'token');
+
+          // Show message (optional)
+          if (context != null) {
+            // ScaffoldMessenger.of(context).showSnackBar(
+            //   SnackBar(content: Text(message ?? 'Session expired.')),
+            // );
+
+            // Navigate to the login page
+            Navigator.pushAndRemoveUntil(
+              context,
+              MaterialPageRoute(builder: (_) => const DashboardWidget()),
+              (route) => false, // Remove all previous routes
+            );
           }
-          return handler.next(err);
-          // Navigator.pushReplacement(
-          //     c!,
-          //     MaterialPageRoute(
-          //       builder: (c) => message != null ? const LoginWidget() : const LoginWidget(),
-          //     ));
-        } else if (err.response?.statusCode == 400) {
-          String? message;
-          if (err.response?.data != null) {
-            if (err.response?.data.runtimeType == String) {
-              message = 'Bad Request';
-            } else {
-              message = err.response?.data['message'].toString();
-            }
-          } else {
-            message = null;
-          }
-          return handler.next(err);
         } else {
-          return handler.next(err);
+          return handler.next(err); // Pass other errors to the handler
         }
-        // Tenant disabled
-        // if (e.response?.statusCode == 402) {
-        //   Navigator.pushReplacement(
-        //       c!,
-        //       MaterialPageRoute(
-        //         builder: (c) => const DisabledWidget(),
-        //       ));
-        // }
-        // else {
-        //   handler.next(e);
-        // }
       } else {
-        print(' ** This is Coming from Auth Interceptor ** : $err');
+        debugPrint(' ** This is Coming from Auth Interceptor ** : $err');
         return handler.next(err);
       }
     } catch (error) {
-      print('** AuthInterceptor catch error ** :   $error');
+      debugPrint('** AuthInterceptor catch error ** : $error');
+      return handler.next(err);
     }
   }
 }

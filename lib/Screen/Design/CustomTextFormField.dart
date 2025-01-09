@@ -24,11 +24,34 @@ class CustomTextFormField extends StatefulWidget {
 class _CustomTextFormFieldState extends State<CustomTextFormField> {
   String _errorText = '';
 
+
   @override
   void initState() {
     // TODO: implement initState
     super.initState();
     widget.controller.addListener(_validateFields);
+  }
+
+
+
+  void validateEmail(String value) {
+    if (value.isEmpty) {
+      _errorText = 'Please enter your email';
+    } else if (!RegExp(r'^[^@]+@[^@]+\.[^@]+').hasMatch(value)) {
+      _errorText = 'Please enter a valid email';
+    } else {
+      _errorText = '';
+    }
+  }
+
+  void validatePhoneNumber(String value) {
+    if (value.isEmpty) {
+      _errorText = 'Please enter your phone number';
+    } else if (!RegExp(r'^9\d{9}$').hasMatch(value)) {
+      _errorText = 'Please enter a valid 10-digit number starting with 9';
+    } else {
+      _errorText = '';
+    }
   }
 
   void _validateFields() {
@@ -49,7 +72,11 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
           if (value.isEmpty) {
             _errorText = 'Please enter your name';
           } else {
-            _errorText = '';
+            if (value.length > 20) {
+              _errorText = 'Name cannot exceed 20 words';
+            } else {
+              _errorText = '';
+            }
           }
           break;
         case 'email':
@@ -73,6 +100,7 @@ class _CustomTextFormFieldState extends State<CustomTextFormField> {
       controller: widget.controller,
       autofocus: false,
       obscureText: false,
+      maxLength: widget.type.toLowerCase() == 'name' ? 20 : null,
       keyboardType: widget.keyboardType,
       decoration: InputDecoration(
         contentPadding: EdgeInsets.symmetric(vertical: 20.0, horizontal: 16.0),

@@ -98,7 +98,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       body['items'].forEach((item) {
         String imageUrl = (item['assets'] != null && item['assets'].isNotEmpty)
             ? item['assets'][0]['url']
-            : 'https://images.pexels.com/photos/1639556/pexels-photo-1639556.jpeg?auto=compress&cs=tinysrgb&w=600'; // Default image URL
+            : ''; // Default image URL
         newVendorData.add(
           VendorModel(
             imageUrl: imageUrl,
@@ -107,7 +107,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             location: item['address'],
             description: item['description'],
             phone: item['phone'],
-            vId: '',
+            vId: item['_id'],
           ),
         );
       });
@@ -128,7 +128,7 @@ class _HomeWidgetState extends State<HomeWidget> {
       body['items'].forEach((item) {
         String imageUrl = (item['assets'] != null && item['assets'].isNotEmpty)
             ? item['assets'][0]['url']
-            : 'https://images.pexels.com/photos/1639556/pexels-photo-1639556.jpeg?auto=compress&cs=tinysrgb&w=600'; // Default image URL
+            : ''; // Default image URL
         newVendorData.add(
           VendorModel(
             imageUrl: imageUrl,
@@ -137,7 +137,7 @@ class _HomeWidgetState extends State<HomeWidget> {
             location: item['address'],
             description: item['description'],
             phone: item['phone'],
-            vId: '',
+            vId: item['_id'],
           ),
         );
       });
@@ -157,247 +157,268 @@ class _HomeWidgetState extends State<HomeWidget> {
 
   @override
   Widget build(BuildContext context) {
-    return LayoutBuilder(
-      builder: (context, constraints) {
-        Size screen = MediaQuery.sizeOf(context);
-        bool isMobile = screen.width < 700;
-        bool isTablet = screen.width >= 700 && screen.width < 900;
-        bool isWeb = screen.width >= 900;
-        //for Card View Vendor Offer
-        if (isMobile) {
-          numberOfCards = 2;
-          cardWidth = screen.width / numberOfCards;
-          crossAxisCount = 2;
-          vendorCardWidth = screen.width / crossAxisCount;
-          cardHeight = screen.height / crossAxisCount;
-        } else if (isTablet) {
-          numberOfCards = 3;
-          cardWidth = screen.width / numberOfCards;
-          crossAxisCount = 4;
-          vendorCardWidth = screen.width / crossAxisCount;
-          cardHeight = screen.height / crossAxisCount;
-        } else {
-          double maxWidth = screen.width > 1600 ? 1600 : screen.width;
-          numberOfCards = 4;
-          cardWidth = maxWidth / numberOfCards;
-          crossAxisCount = 6;
-          vendorCardWidth = screen.width / crossAxisCount;
-          cardHeight = screen.height / crossAxisCount;
-        }
+    return PopScope(
+      canPop: false,
+      child: LayoutBuilder(
+        builder: (context, constraints) {
+          Size screen = MediaQuery.sizeOf(context);
+          bool isMobile = screen.width < 700;
+          bool isTablet = screen.width >= 700 && screen.width < 900;
+          bool isWeb = screen.width >= 900;
+          //for Card View Vendor Offer
+          if (isMobile) {
+            numberOfCards = 2;
+            cardWidth = screen.width / numberOfCards;
+            crossAxisCount = 2;
+            vendorCardWidth = screen.width / crossAxisCount;
+            cardHeight = screen.height / crossAxisCount;
+          } else if (isTablet) {
+            numberOfCards = 3;
+            cardWidth = screen.width / numberOfCards;
+            crossAxisCount = 4;
+            vendorCardWidth = screen.width / crossAxisCount;
+            cardHeight = screen.height / crossAxisCount;
+          } else {
+            double maxWidth = screen.width > 1600 ? 1600 : screen.width;
+            numberOfCards = 4;
+            cardWidth = maxWidth / numberOfCards;
+            crossAxisCount = 6;
+            vendorCardWidth = screen.width / crossAxisCount;
+            cardHeight = screen.height / crossAxisCount;
+          }
 
-        if (_isDownloading) {
-          return Scaffold(
-            backgroundColor: Colors.white,
-            body: Center(
-              child:  CircularProgressIndicator(
-                color: const Color(0xFFDD143D),
+          if (_isDownloading) {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: Center(
+                child: CircularProgressIndicator(
+                  color: const Color(0xFFDD143D),
+                ),
               ),
-            ),
-          );
-        } else {
-          return Scaffold(
-            backgroundColor: Colors.white,
-          body: SafeArea(
-            child: SingleChildScrollView(
-              child: Column(
-                children: [
-                  if (isMobile)
-                    buildSlider(
-                      height: 250.0,
-                      enlargeCenterPage: false,
-                      autoPlay: true,
-                    )
-                    else if (isTablet)
-                      buildSlider(
-                        height: 300.0,
-                        enlargeCenterPage: true,
-                        autoPlay: true,
-                      )
-                    else
-                      buildSlider(
-                        height: 400.0,
-                        enlargeCenterPage: true,
-                        autoPlay: true,
-                      ),
-                    Container(
-                      constraints: BoxConstraints(
-                        maxWidth: 1600, // Equivalent to max-width: 1600px
-                      ),
-                      width: MediaQuery.sizeOf(context)
-                          .width, // Equivalent to width: 100%
+            );
+          } else {
+            return Scaffold(
+              backgroundColor: Colors.white,
+              body: SafeArea(
+                child: SingleChildScrollView(
+                  child: Column(
+                    children: [
+                      if (isMobile)
+                        buildSlider(
+                          height: 250.0,
+                          enlargeCenterPage: false,
+                          autoPlay: true,
+                        )
+                      else if (isTablet)
+                        buildSlider(
+                          height: 300.0,
+                          enlargeCenterPage: true,
+                          autoPlay: true,
+                        )
+                      else
+                        buildSlider(
+                          height: 400.0,
+                          enlargeCenterPage: true,
+                          autoPlay: true,
+                        ),
+                      Container(
+                        constraints: BoxConstraints(
+                          maxWidth: 1600, // Equivalent to max-width: 1600px
+                        ),
+                        width: MediaQuery.sizeOf(context)
+                            .width, // Equivalent to width: 100%
 
-                      child: Column(
-                        children: [
-                          Padding(
-                            padding: const EdgeInsets.only(
-                              top: 16,
-                              bottom: 16,
-                            ),
-                            child: Text(
-                              " Enjoy the exciting offers! ",
-                              textAlign: TextAlign.center,
-                              style: TextStyle(
-                                color: Color(0xFFDD143D),
-                                fontWeight: FontWeight.w600,
-                                fontSize: 26,
+                        child: Column(
+                          children: [
+                            Padding(
+                              padding: const EdgeInsets.only(
+                                top: 16,
+                                bottom: 16,
+                              ),
+                              child: Text(
+                                " Enjoy the exciting offers! ",
+                                textAlign: TextAlign.center,
+                                style: TextStyle(
+                                  color: Color(0xFFDD143D),
+                                  fontWeight: FontWeight.w600,
+                                  fontSize: 26,
+                                ),
                               ),
                             ),
-                          ),
-                          Stack(
-                            children: [
-                              Padding(
-                                padding: const EdgeInsets.only(right: 8.0),
-                                child: SizedBox(
-                                  // width: screen.width,
-                                  height: isMobile ? 180 : 250,
-                                  child: GestureDetector(
-                                    // this code for scrolling in web
-                                    onHorizontalDragUpdate: (details) {
-                                      // Scroll the list based on swipe gesture
-                                      if (_scrollController.hasClients) {
-                                        _scrollController.jumpTo(
-                                          _scrollController.offset -
-                                              details.delta.dx,
-                                        );
-                                      }
-                                    },
-                                    child: ListView.builder(
-                                      controller: _scrollController,
-                                      scrollDirection: Axis.horizontal,
-                                      itemCount: limitedVendorData.length,
-                                      physics: const ClampingScrollPhysics(),
-                                      itemBuilder: (context, index) {
-                                        return SizedBox(
-                                          width: cardWidth,
-                                          child: VendorLimitedOfferWidget(
-                                            discount: limitedVendorData[index]
-                                                .discount,
-                                            vendorName: limitedVendorData[index]
-                                                .vendorName,
-                                            imageUrl: limitedVendorData[index]
-                                                .imageUrl,
-                                            address: limitedVendorData[index]
-                                                .location,
-                                            description:
-                                                limitedVendorData[index]
-                                                    .description,
-                                            phone:
-                                                limitedVendorData[index].phone,
-                                            isLogin: _isLogin,
-                                            vendorId: _isLogin
-                                                ? limitedVendorData[index].vId
-                                                : '',
-                                          ),
-                                        );
+                            Stack(
+                              children: [
+                                Padding(
+                                  padding: const EdgeInsets.only(right: 8.0),
+                                  child: SizedBox(
+                                    // width: screen.width,
+                                    height: isMobile ? 180 : 250,
+                                    child: GestureDetector(
+                                      // this code for scrolling in web
+                                      onHorizontalDragUpdate: (details) {
+                                        // Scroll the list based on swipe gesture
+                                        if (_scrollController.hasClients) {
+                                          _scrollController.jumpTo(
+                                            _scrollController.offset -
+                                                details.delta.dx,
+                                          );
+                                        }
                                       },
-                                    ),
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: (isMobile ? 180 : 250) / 2 - 24,
-                                left: 8,
-                                child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFDD143D),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      if (_scrollController.hasClients) {
-                                        _scrollController.jumpTo(
-                                          (_scrollController.offset + cardWidth)
-                                              .clamp(
-                                            0.0,
-                                            _scrollController
-                                                .position.maxScrollExtent,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    icon: Icon(
-                                      MdiIcons.chevronLeft,
-                                      color: Colors.white,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                ),
-                              ),
-                              Positioned(
-                                top: (isMobile ? 180 : 250) / 2 - 24,
-                                // Adjusting for vertical centering (24 is half the height of the button)
-                                right: 8,
-                                // Adjusting the left position for the forward button
-                                child: Container(
-                                  height: 40,
-                                  width: 40,
-                                  decoration: BoxDecoration(
-                                    color: Color(0xFFDD143D),
-                                    borderRadius: BorderRadius.circular(8),
-                                  ),
-                                  child: IconButton(
-                                    onPressed: () {
-                                      if (_scrollController.hasClients) {
-                                        _scrollController.jumpTo(
-                                          (_scrollController.offset - cardWidth)
-                                              .clamp(
-                                            0.0,
-                                            _scrollController
-                                                .position.maxScrollExtent,
-                                          ),
-                                        );
-                                      }
-                                    },
-                                    icon: Icon(
-                                      MdiIcons.chevronRight,
-                                      color: Colors.white,
-                                    ),
-                                    padding: EdgeInsets.zero,
-                                  ),
-                                ),
-                              ),
-                            ],
-                          ),
-                          Padding(
-                            padding: const EdgeInsets.only(top: 16.0),
-                            child: SizedBox(
-                              height: isMobile
-                                  ? cardHeight * vendorData.length / 2.9
-                                  : cardHeight * vendorData.length / 2.3,
-                              child: Column(
-                                mainAxisAlignment: MainAxisAlignment.start,
-                                crossAxisAlignment: CrossAxisAlignment.start,
-                                children: [
-                                  Align(
-                                    alignment: Alignment.centerLeft,
-                                    // This ensures the text starts from the left
-                                    child: Padding(
-                                      padding: const EdgeInsets.only(
-                                        left: 16.0,
+                                      child: ListView.builder(
+                                        controller: _scrollController,
+                                        scrollDirection: Axis.horizontal,
+                                        itemCount: limitedVendorData.length,
+                                        physics: const ClampingScrollPhysics(),
+                                        itemBuilder: (context, index) {
+                                          return SizedBox(
+                                            width: cardWidth,
+                                            child: VendorLimitedOfferWidget(
+                                              discount: limitedVendorData[index]
+                                                  .discount,
+                                              vendorName:
+                                                  limitedVendorData[index]
+                                                      .vendorName,
+                                              imageUrl: limitedVendorData[index]
+                                                  .imageUrl,
+                                              address: limitedVendorData[index]
+                                                  .location,
+                                              description:
+                                                  limitedVendorData[index]
+                                                      .description,
+                                              phone: limitedVendorData[index]
+                                                  .phone,
+                                              isLogin: _isLogin,
+                                              vendorId: _isLogin
+                                                  ? limitedVendorData[index].vId
+                                                  : '',
+                                            ),
+                                          );
+                                        },
                                       ),
-                                      child: Text(
-                                        "Featured Vendors",
-                                        textAlign: TextAlign.start,
-                                        style: TextStyle(
-                                          fontSize: 18,
-                                          fontWeight: FontWeight.w700,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: (isMobile ? 180 : 250) / 2 - 24,
+                                  left: 8,
+                                  child: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFDD143D),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        // if (_scrollController.hasClients) {
+                                        //   _scrollController.jumpTo(
+                                        //     (_scrollController.offset +
+                                        //             cardWidth)
+                                        //         .clamp(
+                                        //       0.0,
+                                        //       _scrollController
+                                        //           .position.maxScrollExtent,
+                                        //     ),
+                                        //   );
+                                        // }
+
+                                        if (_scrollController.hasClients) {
+                                          _scrollController.jumpTo(
+                                            (_scrollController.offset -
+                                                cardWidth)
+                                                .clamp(
+                                              0.0,
+                                              _scrollController
+                                                  .position.maxScrollExtent,
+                                            ),
+                                          );
+                                        }
+
+                                      },
+                                      icon: Icon(
+                                        MdiIcons.chevronLeft,
+                                        color: Colors.white,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                ),
+                                Positioned(
+                                  top: (isMobile ? 180 : 250) / 2 - 24,
+                                  // Adjusting for vertical centering (24 is half the height of the button)
+                                  right: 8,
+                                  // Adjusting the left position for the forward button
+                                  child: Container(
+                                    height: 40,
+                                    width: 40,
+                                    decoration: BoxDecoration(
+                                      color: Color(0xFFDD143D),
+                                      borderRadius: BorderRadius.circular(8),
+                                    ),
+                                    child: IconButton(
+                                      onPressed: () {
+                                        // if (_scrollController.hasClients) {
+                                        //   _scrollController.jumpTo(
+                                        //     (_scrollController.offset -
+                                        //             cardWidth)
+                                        //         .clamp(
+                                        //       0.0,
+                                        //       _scrollController
+                                        //           .position.maxScrollExtent,
+                                        //     ),
+                                        //   );
+                                        // }
+                                        if (_scrollController.hasClients) {
+                                          _scrollController.jumpTo(
+                                            (_scrollController.offset +
+                                                    cardWidth)
+                                                .clamp(
+                                              0.0,
+                                              _scrollController
+                                                  .position.maxScrollExtent,
+                                            ),
+                                          );
+                                        }
+                                      },
+                                      icon: Icon(
+                                        MdiIcons.chevronRight,
+                                        color: Colors.white,
+                                      ),
+                                      padding: EdgeInsets.zero,
+                                    ),
+                                  ),
+                                ),
+                              ],
+                            ),
+                            Padding(
+                              padding: const EdgeInsets.only(top: 16.0),
+                              child: SizedBox(
+                                // color:Colors.cyan,
+                                height: isMobile
+                                    ? (vendorData.length / 2) * 290
+                                    : cardHeight * vendorData.length / 2.3,
+                                child: Column(
+                                  mainAxisAlignment: MainAxisAlignment.start,
+                                  crossAxisAlignment: CrossAxisAlignment.start,
+                                  children: [
+                                    Align(
+                                      alignment: Alignment.centerLeft,
+                                      // This ensures the text starts from the left
+                                      child: Padding(
+                                        padding: const EdgeInsets.only(
+                                          left: 16.0,
+                                        ),
+                                        child: Text(
+                                          "Featured Vendors",
+                                          textAlign: TextAlign.start,
+                                          style: TextStyle(
+                                            fontSize: 18,
+                                            fontWeight: FontWeight.w700,
+                                          ),
                                         ),
                                       ),
                                     ),
-                                  ),
-                                  Padding(
-                                    padding: const EdgeInsets.only(top: 16.0),
-                                    child: SizedBox(
-                                      height: isMobile
-                                          ? cardHeight *
-                                                  vendorData.length /
-                                                  3.2 -
-                                              42
-                                          : cardHeight *
-                                              vendorData.length /
-                                              2.5,
+                                    Padding(
+                                      padding: const EdgeInsets.only(top: 16.0),
                                       child: Wrap(
                                         // spacing: 8.0, // Space between items horizontally
                                         runSpacing: 8.0,
@@ -420,21 +441,21 @@ class _HomeWidgetState extends State<HomeWidget> {
                                         }).toList(),
                                       ),
                                     ),
-                                  )
-                                ],
+                                  ],
+                                ),
                               ),
                             ),
-                          ),
-                        ],
-                      ),
-                    )
-                  ],
+                          ],
+                        ),
+                      )
+                    ],
+                  ),
                 ),
               ),
-            ),
-          );
-        }
-      },
+            );
+          }
+        },
+      ),
     );
   }
 

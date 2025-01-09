@@ -9,4 +9,12 @@ class NepventProvider with ChangeNotifier {
     _vendor = vendor;
     notifyListeners();
   }
+  // String? _vendorId;
+  //
+  // String? get vendorId => _vendorId;
+  //
+  // void setVendorId(String vendor) {
+  //   _vendorId = vendor;
+  //   notifyListeners();
+  // }
 }
