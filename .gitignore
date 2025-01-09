@@ -11,6 +11,10 @@
 migrate_working_dir/
 .env
 .jks
+<<<<<<< HEAD
+=======
+
+>>>>>>> 255ffc6f05f11364ae7f8281eb6c72ae887f1306
 
 # IntelliJ related
 *.iml
